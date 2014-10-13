@@ -12,11 +12,10 @@ using Livet.EventListeners;
 using Livet.Messaging.Windows;
 
 using OnedrawHelper.Models;
-using OnedrawHelper.Data;
 
 namespace OnedrawHelper.ViewModels
 {
-    public class MainWindowViewModel : ViewModel
+    public class ThemeViewModel : ViewModel
     {
         /* コマンド、プロパティの定義にはそれぞれ 
          * 
@@ -59,49 +58,14 @@ namespace OnedrawHelper.ViewModels
          * LivetのViewModelではプロパティ変更通知(RaisePropertyChanged)やDispatcherCollectionを使ったコレクション変更通知は
          * 自動的にUIDispatcher上での通知に変換されます。変更通知に際してUIDispatcherを操作する必要はありません。
          */
-
-        private Model model { get; set; }
-        public ReadOnlyDispatcherCollection<ThemeViewModel> Themes { get; private set; }
-        private IEnumerator<ThemeViewModel> ThemesEnumerator { get; set; }
-        public ThemeViewModel CurrentTheme
+        public ThemeModel Source { get; private set; }
+        public ThemeViewModel(ThemeModel source)
         {
-            get
-            {
-                try
-                {
-                    return ThemesEnumerator.Current;
-                }
-                catch (InvalidOperationException)
-                {
-                    return null;
-                }
-            }
+            this.Source = source;
         }
 
         public void Initialize()
         {
-            model = Model.Instance;
-
-            Themes = ViewModelHelper.CreateReadOnlyDispatcherCollection(
-                model.Themes,
-                p => new ThemeViewModel(p),
-                DispatcherHelper.UIDispatcher);
-            CompositeDisposable.Add(new CollectionChangedEventListener(Themes,
-                (sender, e) =>
-                {
-                    ThemesEnumerator = Themes.GetEnumerator();
-                    ThemesEnumerator.MoveNext();
-                }));
-            RaisePropertyChanged("Themes");
-
-            model.Initialize();
-        }
-
-
-        protected override void Dispose(bool disposing)
-        {
-            base.Dispose(disposing);
-            CompositeDisposable.Dispose();
         }
     }
 }
