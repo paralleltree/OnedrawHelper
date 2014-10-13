@@ -80,6 +80,7 @@
       <DependentUpon>App.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="Converters\StringCollectionAsFlatConverter.cs" />
     <Compile Include="Models\Model.cs" />
     <Compile Include="Models\ThemeModel.cs" />
     <Compile Include="ViewModels\MainWindowViewModel.cs" />

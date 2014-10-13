@@ -67,6 +67,7 @@ namespace OnedrawHelper.ViewModels
         {
             get
             {
+                if (Themes == null) return null;
                 try
                 {
                     return ThemesEnumerator.Current;
@@ -91,11 +92,46 @@ namespace OnedrawHelper.ViewModels
                 {
                     ThemesEnumerator = Themes.GetEnumerator();
                     ThemesEnumerator.MoveNext();
+                    RaisePropertyChanged("CurrentTheme");
+                    MoveNextThemeCommand.RaiseCanExecuteChanged();
                 }));
             RaisePropertyChanged("Themes");
 
             model.Initialize();
         }
+
+
+        #region MoveNextThemeCommand
+        private ViewModelCommand _MoveNextThemeCommand;
+
+        public ViewModelCommand MoveNextThemeCommand
+        {
+            get
+            {
+                if (_MoveNextThemeCommand == null)
+                {
+                    _MoveNextThemeCommand = new ViewModelCommand(MoveNextTheme, CanMoveNextTheme);
+                }
+                return _MoveNextThemeCommand;
+            }
+        }
+
+        public bool CanMoveNextTheme()
+        {
+            if (Themes == null) return false;
+            return Themes.Count() >= 2;
+        }
+
+        public void MoveNextTheme()
+        {
+            if (!ThemesEnumerator.MoveNext())
+            {
+                ThemesEnumerator.Reset();
+                ThemesEnumerator.MoveNext();
+            }
+            RaisePropertyChanged("CurrentTheme");
+        }
+        #endregion
 
 
         protected override void Dispose(bool disposing)

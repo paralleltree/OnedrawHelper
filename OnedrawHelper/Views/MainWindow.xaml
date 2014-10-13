@@ -6,18 +6,29 @@
         xmlns:l="http://schemas.livet-mvvm.net/2011/wpf"
         xmlns:v="clr-namespace:OnedrawHelper.Views"
         xmlns:vm="clr-namespace:OnedrawHelper.ViewModels"
-        Title="MainWindow" Height="350" Width="525">
-    
+        xmlns:conv="clr-namespace:OnedrawHelper.Converters"
+        Title="OnedrawHelper" WindowStyle="None" AllowsTransparency="True" SizeToContent="Height"
+        Width="200">
+
     <Window.DataContext>
         <vm:MainWindowViewModel/>
     </Window.DataContext>
-    
+
+    <Window.Resources>
+        <SolidColorBrush x:Key="ForegroundColor" Color="Chocolate"/>
+        <conv:StringCollectionAsFlatConverter x:Key="StringCollectionAsFlatConverter"/>
+    </Window.Resources>
+
+    <WindowChrome.WindowChrome>
+        <WindowChrome CaptionHeight="0" ResizeBorderThickness="5" />
+    </WindowChrome.WindowChrome>
+
     <i:Interaction.Triggers>
-    
-    	<!--Viewに特別な要件が存在しない限りは、トリガーやアクションの自作にこだわらず積極的にコードビハインドを使いましょう -->
-    	<!--Viewのコードビハインドは、基本的にView内で完結するロジックとViewModelからのイベントの受信(専用リスナを使用する)に限るとトラブルが少なくなります -->
-    	<!--Livet1.1からはコードビハインドでViewModelのイベントを受信するためのWeakEventLisnterサポートが追加されています --> 
-        
+
+        <!--Viewに特別な要件が存在しない限りは、トリガーやアクションの自作にこだわらず積極的にコードビハインドを使いましょう -->
+        <!--Viewのコードビハインドは、基本的にView内で完結するロジックとViewModelからのイベントの受信(専用リスナを使用する)に限るとトラブルが少なくなります -->
+        <!--Livet1.1からはコードビハインドでViewModelのイベントを受信するためのWeakEventLisnterサポートが追加されています -->
+
         <!--WindowのContentRenderedイベントのタイミングでViewModelのInitializeメソッドが呼ばれます-->
         <i:EventTrigger EventName="ContentRendered">
             <l:LivetCallMethodAction MethodTarget="{Binding}" MethodName="Initialize"/>
@@ -31,8 +42,32 @@
         <!--WindowのCloseキャンセル処理に対応する場合は、WindowCloseCancelBehaviorの使用を検討してください-->
 
     </i:Interaction.Triggers>
-    
-    <Grid>
-        
-    </Grid>
+
+    <Border Background="PaleGoldenrod" BorderBrush="{StaticResource ForegroundColor}" BorderThickness="1">
+        <Grid>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="*"/>
+            </Grid.RowDefinitions>
+            <StackPanel DataContext="{Binding CurrentTheme.Source}">
+                <StackPanel DataContext="{Binding Source}">
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="Auto"/>
+                        </Grid.ColumnDefinitions>
+
+                        <TextBlock Text="{Binding Name}" Foreground="{StaticResource ForegroundColor}" HorizontalAlignment="Center"/>
+                        <Button Margin="0" Grid.Column="2" Command="{Binding DataContext.MoveNextThemeCommand, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=Window}}" Content="4" FontFamily="Marlett"
+                                Width="{Binding ActualHeight, RelativeSource={RelativeSource Self}}"/>
+                    </Grid>
+                </StackPanel>
+                <StackPanel DataContext="{Binding NextChallenge}">
+                    <TextBlock Text="{Binding Subjects, StringFormat=お題 {0}, Converter={StaticResource StringCollectionAsFlatConverter}}"
+                                Foreground="{StaticResource ForegroundColor}" HorizontalAlignment="Center"/>
+                    <TextBlock Text="{Binding StartTime, StringFormat=MM/dd HH:mm～}" FontWeight="Bold" Foreground="{StaticResource ForegroundColor}" HorizontalAlignment="Center"/>
+                </StackPanel>
+            </StackPanel>
+        </Grid>
+    </Border>
 </Window>

@@ -21,7 +21,7 @@ namespace OnedrawHelper.Models
         private readonly string ThemesPath = "themes.json";
 
         private Tokens Token { get; set; }
-        public ObservableSynchronizedCollection<ThemeModel> Themes { get; set; }
+        public ObservableSynchronizedCollection<ThemeModel> Themes { get; private set; }
         private DispatcherTimer Timer { get; set; }
 
         private Model()
