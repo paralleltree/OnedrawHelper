@@ -36,7 +36,7 @@ namespace OnedrawHelper.Models
         public async Task UpdateNextChallengeAsync(Tokens tokens)
         {
             var c = await GetNextChallengeAsync(tokens);
-            if (c != null && NextChallenge == null || c.StartTime < NextChallenge.StartTime)
+            if (c != null && (NextChallenge == null || c.StartTime < NextChallenge.StartTime))
                 NextChallenge = c;
         }
 
@@ -60,7 +60,6 @@ namespace OnedrawHelper.Models
                         p.MatchDate.Groups["day"].Value != "" ? int.Parse(p.MatchDate.Groups["day"].Value) : p.CreatedAt.Day,
                         int.Parse(p.MatchDate.Groups["hour"].Value),
                         int.Parse(p.MatchDate.Groups["min"].Value), 0);
-                    if (start < DateTime.Now) start += TimeSpan.FromDays(1);
 
                     var subjects = Regex.Split(p.MatchSubjects.Groups["subjects"].Value, Source.Extractor.SubjectsSplitPattern).Where(q => !string.IsNullOrWhiteSpace(q)).ToList();
                     var rules = Regex.Split(p.MatchRules.Groups["rules"].Value, Source.Extractor.RulesSplitPattern).Where(q => !string.IsNullOrWhiteSpace(q)).ToList();
