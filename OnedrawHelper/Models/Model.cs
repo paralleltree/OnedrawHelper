@@ -66,10 +66,10 @@ namespace OnedrawHelper.Models
 
         private void UpdateThemes()
         {
-            Task.Run(() =>
+            Task.Run(async () =>
             {
                 foreach (var t in Themes)
-                    t.UpdateNextChallenge(Token);
+                    await t.UpdateNextChallengeAsync(Token);
             });
         }
 

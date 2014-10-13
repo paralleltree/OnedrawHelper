@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text.RegularExpressions;
+using System.Threading.Tasks;
 
 using Livet;
 using OnedrawHelper.Data;
@@ -32,16 +33,16 @@ namespace OnedrawHelper.Models
         }
 
 
-        public void UpdateNextChallenge(Tokens tokens)
+        public async Task UpdateNextChallengeAsync(Tokens tokens)
         {
-            var c = GetNextChallenge(tokens);
+            var c = await GetNextChallengeAsync(tokens);
             if (c != null && NextChallenge == null || c.StartTime < NextChallenge.StartTime)
                 NextChallenge = c;
         }
 
-        public Challenge GetNextChallenge(Tokens tokens)
+        public async Task<Challenge> GetNextChallengeAsync(Tokens tokens)
         {
-            var statuses = tokens.Statuses.UserTimeline(screen_name => Source.SourceScreenName, include_rts => false);
+            var statuses = await tokens.Statuses.UserTimelineAsync(screen_name => Source.SourceScreenName, include_rts => false);
             var challenges = statuses.Select(p =>
                 new
                 {
