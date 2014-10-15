@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.ComponentModel;
+using System.Threading.Tasks;
 
 using Livet;
 using Livet.Commands;
@@ -12,11 +13,11 @@ using Livet.EventListeners;
 using Livet.Messaging.Windows;
 
 using OnedrawHelper.Models;
-using OnedrawHelper.Data;
+using CoreTweet;
 
 namespace OnedrawHelper.ViewModels
 {
-    public class MainWindowViewModel : ViewModel
+    public class AuthorizeTwitterWindowViewModel : ViewModel
     {
         /* コマンド、プロパティの定義にはそれぞれ 
          * 
@@ -61,104 +62,126 @@ namespace OnedrawHelper.ViewModels
          */
 
         private Model model { get; set; }
-        public ReadOnlyDispatcherCollection<ThemeViewModel> Themes { get; private set; }
-        private IEnumerator<ThemeViewModel> ThemesEnumerator { get; set; }
-        public ThemeViewModel CurrentTheme
+        private OAuth.OAuthSession Session { get; set; }
+        private string _pin;
+        public string PinCode
         {
-            get
+            get { return _pin; }
+            set
             {
-                if (Themes == null) return null;
-                try
-                {
-                    return ThemesEnumerator.Current;
-                }
-                catch (InvalidOperationException)
-                {
-                    return null;
-                }
+                if (_pin == value) return;
+                _pin = value;
+                RaisePropertyChanged();
+                AuthorizeCommand.RaiseCanExecuteChanged();
             }
+        }
+
+        private bool _isSessionCreating;
+        public bool IsSessionCreating
+        {
+            get { return _isSessionCreating; }
+            private set
+            {
+                if (_isSessionCreating == value) return;
+                _isSessionCreating = value;
+                RaisePropertyChanged();
+            }
+        }
+        private bool _isSessionCreated;
+        public bool IsSessionCreated
+        {
+            get { return _isSessionCreated; }
+            private set
+            {
+                if (_isSessionCreated == value) return;
+                _isSessionCreated = value;
+                RaisePropertyChanged();
+            }
+        }
+        private bool _isAuthorizing;
+        public bool IsAuthorizing
+        {
+            get { return _isAuthorizing; }
+            private set
+            {
+                if (_isAuthorizing == value) return;
+                _isAuthorizing = value;
+                RaisePropertyChanged();
+            }
+        }
+
+
+        public AuthorizeTwitterWindowViewModel(Model model)
+        {
+            this.model = model;
         }
 
         public void Initialize()
         {
-            model = Model.Instance;
-
-            Themes = ViewModelHelper.CreateReadOnlyDispatcherCollection(
-                model.Themes,
-                p => new ThemeViewModel(p),
-                DispatcherHelper.UIDispatcher);
-            CompositeDisposable.Add(new CollectionChangedEventListener(Themes,
-                (sender, e) =>
-                {
-                    ThemesEnumerator = Themes.GetEnumerator();
-                    ThemesEnumerator.MoveNext();
-                    RaisePropertyChanged("CurrentTheme");
-                    MoveNextThemeCommand.RaiseCanExecuteChanged();
-                }));
-            RaisePropertyChanged("Themes");
-
-            model.Initialize();
         }
 
 
-        #region MoveNextThemeCommand
-        private ViewModelCommand _MoveNextThemeCommand;
+        #region CreateSessionCommand
+        private ViewModelCommand _CreateSessionCommand;
 
-        public ViewModelCommand MoveNextThemeCommand
+        public ViewModelCommand CreateSessionCommand
         {
             get
             {
-                if (_MoveNextThemeCommand == null)
+                if (_CreateSessionCommand == null)
                 {
-                    _MoveNextThemeCommand = new ViewModelCommand(MoveNextTheme, CanMoveNextTheme);
+                    _CreateSessionCommand = new ViewModelCommand(CreateSession);
                 }
-                return _MoveNextThemeCommand;
+                return _CreateSessionCommand;
             }
         }
 
-        public bool CanMoveNextTheme()
+        public void CreateSession()
         {
-            if (Themes == null) return false;
-            return Themes.Count() >= 2;
-        }
-
-        public void MoveNextTheme()
-        {
-            if (!ThemesEnumerator.MoveNext())
+            this.IsSessionCreating = true;
+            Task.Run(async () =>
             {
-                ThemesEnumerator.Reset();
-                ThemesEnumerator.MoveNext();
-            }
-            RaisePropertyChanged("CurrentTheme");
+                this.Session = await model.CreateAuthorizeSession();
+                System.Diagnostics.Process.Start(Session.AuthorizeUri.AbsoluteUri);
+                this.IsSessionCreated = true;
+            });
         }
         #endregion
 
-        #region AuthorizeTwitterCommand
-        private ViewModelCommand _AuthorizeTwitterCommand;
+        #region AuthorizeCommand
+        private ViewModelCommand _AuthorizeCommand;
 
-        public ViewModelCommand AuthorizeTwitterCommand
+        public ViewModelCommand AuthorizeCommand
         {
             get
             {
-                if (_AuthorizeTwitterCommand == null)
+                if (_AuthorizeCommand == null)
                 {
-                    _AuthorizeTwitterCommand = new ViewModelCommand(AuthorizeTwitter);
+                    _AuthorizeCommand = new ViewModelCommand(Authorize, CanAuthorize);
                 }
-                return _AuthorizeTwitterCommand;
+                return _AuthorizeCommand;
             }
         }
 
-        public void AuthorizeTwitter()
+        public bool CanAuthorize()
         {
-            Messenger.Raise(new TransitionMessage(new AuthorizeTwitterWindowViewModel(this.model), "AuthorizeTwitter"));
+            return this.IsSessionCreated && this.PinCode.Length == 7;
+        }
+
+        public void Authorize()
+        {
+            this.IsAuthorizing = true;
+            Task.Run(async () =>
+            {
+                bool result = await model.Authorize(this.Session, this.PinCode);
+                this.IsAuthorizing = false;
+                if (result)
+                    this.Messenger.Raise(new InteractionMessage("Close"));
+                else
+                    this.Messenger.Raise(new InformationMessage("認証に失敗しました。\nPINコードを再度確認してください。", "認証エラー", System.Windows.MessageBoxImage.Error, "AuthorizeError"));
+            });
         }
         #endregion
 
-
-        protected override void Dispose(bool disposing)
-        {
-            base.Dispose(disposing);
-            CompositeDisposable.Dispose();
-        }
     }
 }

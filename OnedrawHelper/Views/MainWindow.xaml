@@ -97,6 +97,10 @@
 
         <!--WindowのCloseキャンセル処理に対応する場合は、WindowCloseCancelBehaviorの使用を検討してください-->
 
+
+        <l:InteractionMessageTrigger MessageKey="AuthorizeTwitter" Messenger="{Binding Messenger}">
+            <l:TransitionInteractionMessageAction WindowType="{x:Type v:AuthorizeTwitterWindow}" Mode="Modal"/>
+        </l:InteractionMessageTrigger>
     </i:Interaction.Triggers>
 
     <Border Background="PaleGoldenrod" BorderBrush="{StaticResource ForegroundBrush}" BorderThickness="1">
@@ -130,9 +134,10 @@
 
             <StackPanel Grid.Row="1" Orientation="Horizontal" HorizontalAlignment="Right">
                 <Button Style="{StaticResource CaptionButtonStyle}" Content="o"
-                            Width="{Binding ActualHeight, RelativeSource={RelativeSource Self}}"/>
+                        Command="{Binding AuthorizeTwitterCommand}"
+                        Width="{Binding ActualHeight, RelativeSource={RelativeSource Self}}"/>
                 <Button Style="{StaticResource CaptionButtonStyle}" Content="0"
-                            Width="{Binding ActualHeight, RelativeSource={RelativeSource Self}}">
+                        Width="{Binding ActualHeight, RelativeSource={RelativeSource Self}}">
                     <i:Interaction.Triggers>
                         <i:EventTrigger EventName="Click">
                             <l:WindowInteractionMessageAction>

@@ -72,6 +72,10 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Page Include="Views\AuthorizeTwitterWindow.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="Views\MainWindow.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
@@ -80,11 +84,16 @@
       <DependentUpon>App.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="Converters\InverseBooleanConverter.cs" />
     <Compile Include="Converters\StringCollectionAsFlatConverter.cs" />
     <Compile Include="Models\Model.cs" />
     <Compile Include="Models\ThemeModel.cs" />
+    <Compile Include="ViewModels\AuthorizeTwitterWindowViewModel.cs" />
     <Compile Include="ViewModels\MainWindowViewModel.cs" />
     <Compile Include="ViewModels\ThemeViewModel.cs" />
+    <Compile Include="Views\AuthorizeTwitterWindow.xaml.cs">
+      <DependentUpon>AuthorizeTwitterWindow.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Views\MainWindow.xaml.cs">
       <DependentUpon>MainWindow.xaml</DependentUpon>
       <SubType>Code</SubType>
