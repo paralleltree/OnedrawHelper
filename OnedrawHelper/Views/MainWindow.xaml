@@ -119,9 +119,22 @@
                         </Grid.ColumnDefinitions>
 
                         <TextBlock Text="{Binding Name}" Foreground="{StaticResource ForegroundBrush}" HorizontalAlignment="Center"/>
-                        <Button Style="{StaticResource CaptionButtonStyle}" Grid.Column="2" Content="4"
+                        <Button Grid.Column="2" Content="4"
                                 Command="{Binding DataContext.MoveNextThemeCommand, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=Window}}"
-                                Width="{Binding ActualHeight, RelativeSource={RelativeSource Self}}"/>
+                                Width="{Binding ActualHeight, RelativeSource={RelativeSource Self}}">
+                            <Button.Style>
+                                <Style TargetType="Button" BasedOn="{StaticResource CaptionButtonStyle}">
+                                    <Style.Triggers>
+                                        <DataTrigger Binding="{Binding DataContext.IsUpdatedAny, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=Window}}" Value="True">
+                                            <Setter Property="Foreground" Value="Red"/>
+                                        </DataTrigger>
+                                        <DataTrigger Binding="{Binding DataContext.IsUpdatedAny, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=Window}}" Value="False">
+                                            <Setter Property="Foreground" Value="Black"/>
+                                        </DataTrigger>
+                                    </Style.Triggers>
+                                </Style>
+                            </Button.Style>
+                        </Button>
                     </Grid>
                 </StackPanel>
                 <StackPanel DataContext="{Binding NextChallenge}">
@@ -133,9 +146,21 @@
             </StackPanel>
 
             <StackPanel Grid.Row="1" Orientation="Horizontal" HorizontalAlignment="Right">
-                <Button Style="{StaticResource CaptionButtonStyle}" Content="o"
-                        Command="{Binding AuthorizeTwitterCommand}"
-                        Width="{Binding ActualHeight, RelativeSource={RelativeSource Self}}"/>
+                <Button Command="{Binding AuthorizeTwitterCommand}" Content="o"
+                        Width="{Binding ActualHeight, RelativeSource={RelativeSource Self}}">
+                    <Button.Style>
+                        <Style TargetType="Button" BasedOn="{StaticResource CaptionButtonStyle}">
+                            <Style.Triggers>
+                                <DataTrigger Binding="{Binding IsAuthorized}" Value="True">
+                                    <Setter Property="Foreground" Value="Blue"/>
+                                </DataTrigger>
+                                <DataTrigger Binding="{Binding IsAuthorized}" Value="False">
+                                    <Setter Property="Foreground" Value="Red"/>
+                                </DataTrigger>
+                            </Style.Triggers>
+                        </Style>
+                    </Button.Style>
+                </Button>
                 <Button Style="{StaticResource CaptionButtonStyle}" Content="0"
                         Width="{Binding ActualHeight, RelativeSource={RelativeSource Self}}">
                     <i:Interaction.Triggers>

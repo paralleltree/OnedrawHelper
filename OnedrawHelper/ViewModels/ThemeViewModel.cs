@@ -58,10 +58,27 @@ namespace OnedrawHelper.ViewModels
          * LivetのViewModelではプロパティ変更通知(RaisePropertyChanged)やDispatcherCollectionを使ったコレクション変更通知は
          * 自動的にUIDispatcher上での通知に変換されます。変更通知に際してUIDispatcherを操作する必要はありません。
          */
+
         public ThemeModel Source { get; private set; }
+        private bool _isUpdated;
+        public bool IsUpdated
+        {
+            get { return _isUpdated; }
+            set
+            {
+                if (_isUpdated == value) return;
+                _isUpdated = value;
+                RaisePropertyChanged();
+            }
+        }
         public ThemeViewModel(ThemeModel source)
         {
             this.Source = source;
+            var listener = new EventListener<EventHandler>(
+                h => source.ChallengeUpdated += h,
+                h => source.ChallengeUpdated -= h,
+                (sender, e) => IsUpdated = true);
+            CompositeDisposable.Add(listener);
         }
 
         public void Initialize()

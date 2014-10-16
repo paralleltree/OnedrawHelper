@@ -21,7 +21,18 @@ namespace OnedrawHelper.Models
         private readonly string ThemesPath = "themes.json";
         private readonly string SettingPath = "settings.json";
 
-        private Tokens Token { get; set; }
+        private Tokens _token;
+        private Tokens Token
+        {
+            get { return _token; }
+            set
+            {
+                if (_token == value) return;
+                _token = value;
+                RaisePropertyChanged("IsAuthorized");
+            }
+        }
+        public bool IsAuthorized { get { return Token != null; } }
         public ObservableSynchronizedCollection<ThemeModel> Themes { get; private set; }
         private DispatcherTimer Timer { get; set; }
 
@@ -55,7 +66,11 @@ namespace OnedrawHelper.Models
             if (File.Exists(SettingPath))
             {
                 var settings = JsonConvert.DeserializeObject<Dictionary<string, string>>(File.ReadAllText(SettingPath));
-                Token = Tokens.Create(Properties.Resources.ConsumerKey, Properties.Resources.ConsumerSecret, settings["AccessToken"], settings["AccessTokenSecret"]);
+                try
+                {
+                    Token = Tokens.Create(Properties.Resources.ConsumerKey, Properties.Resources.ConsumerSecret, settings["AccessToken"], settings["AccessTokenSecret"]);
+                }
+                catch { }
             }
 
             if (Token != null) UpdateThemes();

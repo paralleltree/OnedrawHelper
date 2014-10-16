@@ -61,6 +61,14 @@ namespace OnedrawHelper.ViewModels
          */
 
         private Model model { get; set; }
+        public bool IsAuthorized
+        {
+            get
+            {
+                if (model == null) return false;
+                return model.IsAuthorized;
+            }
+        }
         public ReadOnlyDispatcherCollection<ThemeViewModel> Themes { get; private set; }
         private IEnumerator<ThemeViewModel> ThemesEnumerator { get; set; }
         public ThemeViewModel CurrentTheme
@@ -78,6 +86,7 @@ namespace OnedrawHelper.ViewModels
                 }
             }
         }
+        public bool IsUpdatedAny { get { return CanMoveNextTheme() && Themes.Any(p => p.IsUpdated); } }
 
         public void Initialize()
         {
@@ -94,8 +103,36 @@ namespace OnedrawHelper.ViewModels
                     ThemesEnumerator.MoveNext();
                     RaisePropertyChanged("CurrentTheme");
                     MoveNextThemeCommand.RaiseCanExecuteChanged();
+
+                    switch (e.Action)
+                    {
+                        case System.Collections.Specialized.NotifyCollectionChangedAction.Add:
+                            foreach (ThemeViewModel item in e.NewItems)
+                                CompositeDisposable.Add(new PropertyChangedEventListener(item,
+                                    (p, q) =>
+                                    {
+                                        if (q.PropertyName == "IsUpdated")
+                                        {
+                                            CurrentTheme.IsUpdated = false;
+                                            RaisePropertyChanged("IsUpdatedAny");
+                                        }
+                                    }));
+                            break;
+                    }
                 }));
             RaisePropertyChanged("Themes");
+
+            var listener = new PropertyChangedEventListener(model);
+            listener.Add((sender, e) =>
+            {
+                switch (e.PropertyName)
+                {
+                    case "IsAuthorized":
+                        RaisePropertyChanged("IsAuthorized");
+                        break;
+                }
+            });
+            CompositeDisposable.Add(listener);
 
             model.Initialize();
         }
@@ -129,6 +166,7 @@ namespace OnedrawHelper.ViewModels
                 ThemesEnumerator.Reset();
                 ThemesEnumerator.MoveNext();
             }
+            CurrentTheme.IsUpdated = false;
             RaisePropertyChanged("CurrentTheme");
         }
         #endregion

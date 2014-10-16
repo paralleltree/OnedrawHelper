@@ -24,8 +24,11 @@ namespace OnedrawHelper.Models
             {
                 _nextChallenge = value;
                 RaisePropertyChanged();
+                if (this.ChallengeUpdated != null) this.ChallengeUpdated(this, null);
             }
         }
+        public event EventHandler ChallengeUpdated;
+
 
         public ThemeModel(Theme source)
         {
