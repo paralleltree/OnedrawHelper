@@ -23,20 +23,13 @@ namespace OnedrawHelper.Views
      */
 
     /// <summary>
-    /// MainWindow.xaml の相互作用ロジック
+    /// AuthorizeTwitterWindow.xaml の相互作用ロジック
     /// </summary>
-    public partial class MainWindow : Window
+    public partial class AuthorizeTwitterWindow : Window
     {
-        public MainWindow()
+        public AuthorizeTwitterWindow()
         {
             InitializeComponent();
-            this.MouseLeftButtonDown += (sender, e) => this.DragMove();
-            this.SizeChanged += (sender, e) =>
-               {
-                   this.SizeToContent = SizeToContent.Height;
-                   this.MinHeight = this.ActualHeight;
-                   this.MaxHeight = this.ActualHeight;
-               };
         }
     }
 }
