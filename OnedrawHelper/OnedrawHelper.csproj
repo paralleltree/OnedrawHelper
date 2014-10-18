@@ -34,6 +34,9 @@
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
+  <PropertyGroup>
+    <ApplicationIcon>Resources\MainIcon.ico</ApplicationIcon>
+  </PropertyGroup>
   <ItemGroup>
     <Reference Include="CoreTweet">
       <HintPath>..\packages\CoreTweet.0.4.0\lib\net45\CoreTweet.dll</HintPath>
@@ -51,6 +54,7 @@
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Data" />
+    <Reference Include="System.Drawing" />
     <Reference Include="System.Windows.Interactivity">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\..\..\..\AppData\Local\Temporary Projects\OnedrawHelper\InfrastructureAssemblies\System.Windows.Interactivity.dll</HintPath>
@@ -130,6 +134,7 @@
     <Content Include="InfrastructureAssemblies\Livet.XML" />
     <Content Include="InfrastructureAssemblies\Microsoft.Expression.Interactions.dll" />
     <Content Include="InfrastructureAssemblies\System.Windows.Interactivity.dll" />
+    <Resource Include="Resources\MainIcon.ico" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\OnedrawHelper.Data\OnedrawHelper.Data.csproj">

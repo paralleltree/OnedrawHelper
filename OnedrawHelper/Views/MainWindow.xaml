@@ -8,6 +8,7 @@
         xmlns:vm="clr-namespace:OnedrawHelper.ViewModels"
         xmlns:conv="clr-namespace:OnedrawHelper.Converters"
         Title="OnedrawHelper" WindowStyle="None" AllowsTransparency="True" SizeToContent="Height"
+        Icon="../Resources/MainIcon.ico"
         Width="200">
 
     <Window.DataContext>
@@ -119,7 +120,7 @@
                         </Grid.ColumnDefinitions>
 
                         <TextBlock Text="{Binding Name}" Foreground="{StaticResource ForegroundBrush}" HorizontalAlignment="Center"/>
-                        <Button Grid.Column="2" Content="4"
+                        <Button Grid.Column="2" Content="4" Visibility="Collapsed"
                                 Command="{Binding DataContext.MoveNextThemeCommand, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=Window}}"
                                 Width="{Binding ActualHeight, RelativeSource={RelativeSource Self}}">
                             <Button.Style>
@@ -146,7 +147,7 @@
             </StackPanel>
 
             <StackPanel Grid.Row="1" Orientation="Horizontal" HorizontalAlignment="Right">
-                <Button Command="{Binding AuthorizeTwitterCommand}" Content="o"
+                <Button Command="{Binding AuthorizeTwitterCommand}" Content="o" ToolTip="Twitter認証"
                         Width="{Binding ActualHeight, RelativeSource={RelativeSource Self}}">
                     <Button.Style>
                         <Style TargetType="Button" BasedOn="{StaticResource CaptionButtonStyle}">
@@ -161,7 +162,7 @@
                         </Style>
                     </Button.Style>
                 </Button>
-                <Button Style="{StaticResource CaptionButtonStyle}" Content="0"
+                <Button Style="{StaticResource CaptionButtonStyle}" Content="0" ToolTip="最小化"
                         Width="{Binding ActualHeight, RelativeSource={RelativeSource Self}}">
                     <i:Interaction.Triggers>
                         <i:EventTrigger EventName="Click">

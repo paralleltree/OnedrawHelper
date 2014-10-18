@@ -44,13 +44,14 @@ namespace OnedrawHelper.Models
 
         ~Model()
         {
+            Timer.Stop();
+            //File.WriteAllText(ThemesPath, JsonConvert.SerializeObject(Themes.Select(p => p.Source)));
+            if (Token == null) return;
             File.WriteAllText(SettingPath, JsonConvert.SerializeObject(new Dictionary<string, string>()
             {
                 { "AccessToken", Token.AccessToken },
                 { "AccessTokenSecret", Token.AccessTokenSecret }
             }));
-            //File.WriteAllText(ThemesPath, JsonConvert.SerializeObject(Themes.Select(p => p.Source)));
-            Timer.Stop();
         }
 
         public void Initialize()
@@ -73,7 +74,7 @@ namespace OnedrawHelper.Models
                 catch { }
             }
 
-            if (Token != null) UpdateThemes();
+            UpdateThemes();
             Timer.Tick += (sender, e) => UpdateThemes();
             Timer.Start();
         }
@@ -93,6 +94,7 @@ namespace OnedrawHelper.Models
 
         private void UpdateThemes()
         {
+            if (Token == null) return;
             Task.Run(async () =>
             {
                 foreach (var t in Themes)
