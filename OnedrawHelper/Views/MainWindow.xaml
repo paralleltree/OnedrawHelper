@@ -6,18 +6,85 @@
         xmlns:l="http://schemas.livet-mvvm.net/2011/wpf"
         xmlns:v="clr-namespace:OnedrawHelper.Views"
         xmlns:vm="clr-namespace:OnedrawHelper.ViewModels"
-        Title="MainWindow" Height="350" Width="525">
-    
+        xmlns:conv="clr-namespace:OnedrawHelper.Converters"
+        Title="OnedrawHelper" WindowStyle="None" AllowsTransparency="True" SizeToContent="Height"
+        Width="200">
+
     <Window.DataContext>
         <vm:MainWindowViewModel/>
     </Window.DataContext>
-    
+
+    <Window.Resources>
+        <SolidColorBrush x:Key="ForegroundBrush" Color="Chocolate"/>
+        <conv:StringCollectionAsFlatConverter x:Key="StringCollectionAsFlatConverter"/>
+        <Style x:Key="CaptionButtonStyle" TargetType="Button">
+            <Setter Property="OverridesDefaultStyle" Value="True"/>
+            <Setter Property="FontFamily" Value="Marlett"/>
+            <Setter Property="WindowChrome.IsHitTestVisibleInChrome" Value="True" />
+            <Setter Property="Background" Value="{StaticResource ForegroundBrush}"/>
+            <Setter Property="FocusVisualStyle" Value="{x:Null}" />
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border x:Name="border" Background="{TemplateBinding Background}">
+                            <VisualStateManager.VisualStateGroups>
+                                <VisualStateGroup x:Name="CommonStates">
+                                    <VisualState x:Name="Normal">
+                                        <Storyboard>
+                                            <DoubleAnimationUsingKeyFrames Storyboard.TargetProperty="(UIElement.Opacity)" Storyboard.TargetName="border">
+                                                <EasingDoubleKeyFrame KeyTime="0" Value="1"/>
+                                            </DoubleAnimationUsingKeyFrames>
+                                            <DoubleAnimationUsingKeyFrames Storyboard.TargetProperty="(Control.Background).Opacity" Storyboard.TargetName="border">
+                                                <EasingDoubleKeyFrame KeyTime="0" Value="0"/>
+                                            </DoubleAnimationUsingKeyFrames>
+                                        </Storyboard>
+                                    </VisualState>
+                                    <VisualState x:Name="MouseOver">
+                                        <Storyboard>
+                                            <DoubleAnimationUsingKeyFrames Storyboard.TargetProperty="(Control.Background).Opacity" Storyboard.TargetName="border">
+                                                <EasingDoubleKeyFrame KeyTime="0" Value="0.5"/>
+                                            </DoubleAnimationUsingKeyFrames>
+                                        </Storyboard>
+                                    </VisualState>
+                                    <VisualState x:Name="Pressed">
+                                        <Storyboard>
+                                            <DoubleAnimationUsingKeyFrames Storyboard.TargetProperty="(Control.Background).Opacity" Storyboard.TargetName="border">
+                                                <EasingDoubleKeyFrame KeyTime="0" Value="1"/>
+                                            </DoubleAnimationUsingKeyFrames>
+                                        </Storyboard>
+                                    </VisualState>
+                                    <VisualState x:Name="Disabled">
+                                        <Storyboard>
+                                            <DoubleAnimationUsingKeyFrames Storyboard.TargetProperty="(UIElement.Opacity)" Storyboard.TargetName="border">
+                                                <EasingDoubleKeyFrame KeyTime="0" Value="0.6"/>
+                                            </DoubleAnimationUsingKeyFrames>
+                                            <DoubleAnimationUsingKeyFrames Storyboard.TargetProperty="(Control.Background).Opacity" Storyboard.TargetName="border">
+                                                <EasingDoubleKeyFrame KeyTime="0" Value="0"/>
+                                            </DoubleAnimationUsingKeyFrames>
+                                        </Storyboard>
+                                    </VisualState>
+                                </VisualStateGroup>
+                            </VisualStateManager.VisualStateGroups>
+
+                            <ContentPresenter Content="{TemplateBinding Content}" Focusable="False" Margin="{TemplateBinding Padding}"
+                                              HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                        </Border>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+    </Window.Resources>
+
+    <WindowChrome.WindowChrome>
+        <WindowChrome CaptionHeight="0" ResizeBorderThickness="5"/>
+    </WindowChrome.WindowChrome>
+
     <i:Interaction.Triggers>
-    
-    	<!--Viewに特別な要件が存在しない限りは、トリガーやアクションの自作にこだわらず積極的にコードビハインドを使いましょう -->
-    	<!--Viewのコードビハインドは、基本的にView内で完結するロジックとViewModelからのイベントの受信(専用リスナを使用する)に限るとトラブルが少なくなります -->
-    	<!--Livet1.1からはコードビハインドでViewModelのイベントを受信するためのWeakEventLisnterサポートが追加されています --> 
-        
+
+        <!--Viewに特別な要件が存在しない限りは、トリガーやアクションの自作にこだわらず積極的にコードビハインドを使いましょう -->
+        <!--Viewのコードビハインドは、基本的にView内で完結するロジックとViewModelからのイベントの受信(専用リスナを使用する)に限るとトラブルが少なくなります -->
+        <!--Livet1.1からはコードビハインドでViewModelのイベントを受信するためのWeakEventLisnterサポートが追加されています -->
+
         <!--WindowのContentRenderedイベントのタイミングでViewModelのInitializeメソッドが呼ばれます-->
         <i:EventTrigger EventName="ContentRendered">
             <l:LivetCallMethodAction MethodTarget="{Binding}" MethodName="Initialize"/>
@@ -30,9 +97,83 @@
 
         <!--WindowのCloseキャンセル処理に対応する場合は、WindowCloseCancelBehaviorの使用を検討してください-->
 
+
+        <l:InteractionMessageTrigger MessageKey="AuthorizeTwitter" Messenger="{Binding Messenger}">
+            <l:TransitionInteractionMessageAction WindowType="{x:Type v:AuthorizeTwitterWindow}" Mode="Modal"/>
+        </l:InteractionMessageTrigger>
     </i:Interaction.Triggers>
-    
-    <Grid>
-        
-    </Grid>
+
+    <Border Background="PaleGoldenrod" BorderBrush="{StaticResource ForegroundBrush}" BorderThickness="1">
+        <Grid Margin="1">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+            </Grid.RowDefinitions>
+
+            <StackPanel DataContext="{Binding CurrentTheme.Source}">
+                <StackPanel DataContext="{Binding Source}">
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="Auto"/>
+                        </Grid.ColumnDefinitions>
+
+                        <TextBlock Text="{Binding Name}" Foreground="{StaticResource ForegroundBrush}" HorizontalAlignment="Center"/>
+                        <Button Grid.Column="2" Content="4"
+                                Command="{Binding DataContext.MoveNextThemeCommand, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=Window}}"
+                                Width="{Binding ActualHeight, RelativeSource={RelativeSource Self}}">
+                            <Button.Style>
+                                <Style TargetType="Button" BasedOn="{StaticResource CaptionButtonStyle}">
+                                    <Style.Triggers>
+                                        <DataTrigger Binding="{Binding DataContext.IsUpdatedAny, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=Window}}" Value="True">
+                                            <Setter Property="Foreground" Value="Red"/>
+                                        </DataTrigger>
+                                        <DataTrigger Binding="{Binding DataContext.IsUpdatedAny, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=Window}}" Value="False">
+                                            <Setter Property="Foreground" Value="Black"/>
+                                        </DataTrigger>
+                                    </Style.Triggers>
+                                </Style>
+                            </Button.Style>
+                        </Button>
+                    </Grid>
+                </StackPanel>
+                <StackPanel DataContext="{Binding NextChallenge}">
+                    <TextBlock Text="{Binding Subjects, StringFormat=お題 {0}, Converter={StaticResource StringCollectionAsFlatConverter}}"
+                               Foreground="{StaticResource ForegroundBrush}" HorizontalAlignment="Center"/>
+                    <TextBlock Text="{Binding StartTime, StringFormat=MM/dd HH:mm～}" FontWeight="Bold"
+                               Foreground="{StaticResource ForegroundBrush}" HorizontalAlignment="Center"/>
+                </StackPanel>
+            </StackPanel>
+
+            <StackPanel Grid.Row="1" Orientation="Horizontal" HorizontalAlignment="Right">
+                <Button Command="{Binding AuthorizeTwitterCommand}" Content="o"
+                        Width="{Binding ActualHeight, RelativeSource={RelativeSource Self}}">
+                    <Button.Style>
+                        <Style TargetType="Button" BasedOn="{StaticResource CaptionButtonStyle}">
+                            <Style.Triggers>
+                                <DataTrigger Binding="{Binding IsAuthorized}" Value="True">
+                                    <Setter Property="Foreground" Value="Blue"/>
+                                </DataTrigger>
+                                <DataTrigger Binding="{Binding IsAuthorized}" Value="False">
+                                    <Setter Property="Foreground" Value="Red"/>
+                                </DataTrigger>
+                            </Style.Triggers>
+                        </Style>
+                    </Button.Style>
+                </Button>
+                <Button Style="{StaticResource CaptionButtonStyle}" Content="0"
+                        Width="{Binding ActualHeight, RelativeSource={RelativeSource Self}}">
+                    <i:Interaction.Triggers>
+                        <i:EventTrigger EventName="Click">
+                            <l:WindowInteractionMessageAction>
+                                <l:DirectInteractionMessage>
+                                    <l:WindowActionMessage Action="Minimize"/>
+                                </l:DirectInteractionMessage>
+                            </l:WindowInteractionMessageAction>
+                        </i:EventTrigger>
+                    </i:Interaction.Triggers>
+                </Button>
+            </StackPanel>
+        </Grid>
+    </Border>
 </Window>

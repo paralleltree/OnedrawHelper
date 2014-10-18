@@ -12,6 +12,7 @@ using Livet.EventListeners;
 using Livet.Messaging.Windows;
 
 using OnedrawHelper.Models;
+using OnedrawHelper.Data;
 
 namespace OnedrawHelper.ViewModels
 {
@@ -59,8 +60,143 @@ namespace OnedrawHelper.ViewModels
          * 自動的にUIDispatcher上での通知に変換されます。変更通知に際してUIDispatcherを操作する必要はありません。
          */
 
+        private Model model { get; set; }
+        public bool IsAuthorized
+        {
+            get
+            {
+                if (model == null) return false;
+                return model.IsAuthorized;
+            }
+        }
+        public ReadOnlyDispatcherCollection<ThemeViewModel> Themes { get; private set; }
+        private IEnumerator<ThemeViewModel> ThemesEnumerator { get; set; }
+        public ThemeViewModel CurrentTheme
+        {
+            get
+            {
+                if (Themes == null) return null;
+                try
+                {
+                    return ThemesEnumerator.Current;
+                }
+                catch (InvalidOperationException)
+                {
+                    return null;
+                }
+            }
+        }
+        public bool IsUpdatedAny { get { return CanMoveNextTheme() && Themes.Any(p => p.IsUpdated); } }
+
         public void Initialize()
         {
+            model = Model.Instance;
+
+            Themes = ViewModelHelper.CreateReadOnlyDispatcherCollection(
+                model.Themes,
+                p => new ThemeViewModel(p),
+                DispatcherHelper.UIDispatcher);
+            CompositeDisposable.Add(new CollectionChangedEventListener(Themes,
+                (sender, e) =>
+                {
+                    ThemesEnumerator = Themes.GetEnumerator();
+                    ThemesEnumerator.MoveNext();
+                    RaisePropertyChanged("CurrentTheme");
+                    MoveNextThemeCommand.RaiseCanExecuteChanged();
+
+                    switch (e.Action)
+                    {
+                        case System.Collections.Specialized.NotifyCollectionChangedAction.Add:
+                            foreach (ThemeViewModel item in e.NewItems)
+                                CompositeDisposable.Add(new PropertyChangedEventListener(item,
+                                    (p, q) =>
+                                    {
+                                        if (q.PropertyName == "IsUpdated")
+                                        {
+                                            CurrentTheme.IsUpdated = false;
+                                            RaisePropertyChanged("IsUpdatedAny");
+                                        }
+                                    }));
+                            break;
+                    }
+                }));
+            RaisePropertyChanged("Themes");
+
+            var listener = new PropertyChangedEventListener(model);
+            listener.Add((sender, e) =>
+            {
+                switch (e.PropertyName)
+                {
+                    case "IsAuthorized":
+                        RaisePropertyChanged("IsAuthorized");
+                        break;
+                }
+            });
+            CompositeDisposable.Add(listener);
+
+            model.Initialize();
+        }
+
+
+        #region MoveNextThemeCommand
+        private ViewModelCommand _MoveNextThemeCommand;
+
+        public ViewModelCommand MoveNextThemeCommand
+        {
+            get
+            {
+                if (_MoveNextThemeCommand == null)
+                {
+                    _MoveNextThemeCommand = new ViewModelCommand(MoveNextTheme, CanMoveNextTheme);
+                }
+                return _MoveNextThemeCommand;
+            }
+        }
+
+        public bool CanMoveNextTheme()
+        {
+            if (Themes == null) return false;
+            return Themes.Count() >= 2;
+        }
+
+        public void MoveNextTheme()
+        {
+            if (!ThemesEnumerator.MoveNext())
+            {
+                ThemesEnumerator.Reset();
+                ThemesEnumerator.MoveNext();
+            }
+            CurrentTheme.IsUpdated = false;
+            RaisePropertyChanged("CurrentTheme");
+        }
+        #endregion
+
+        #region AuthorizeTwitterCommand
+        private ViewModelCommand _AuthorizeTwitterCommand;
+
+        public ViewModelCommand AuthorizeTwitterCommand
+        {
+            get
+            {
+                if (_AuthorizeTwitterCommand == null)
+                {
+                    _AuthorizeTwitterCommand = new ViewModelCommand(AuthorizeTwitter);
+                }
+                return _AuthorizeTwitterCommand;
+            }
+        }
+
+        public void AuthorizeTwitter()
+        {
+            Messenger.Raise(new TransitionMessage(new AuthorizeTwitterWindowViewModel(this.model), "AuthorizeTwitter"));
+        }
+        #endregion
+
+
+        protected override void Dispose(bool disposing)
+        {
+            base.Dispose(disposing);
+            CompositeDisposable.Dispose();
         }
     }
 }
