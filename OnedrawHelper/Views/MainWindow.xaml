@@ -7,6 +7,7 @@
         xmlns:v="clr-namespace:OnedrawHelper.Views"
         xmlns:vm="clr-namespace:OnedrawHelper.ViewModels"
         xmlns:conv="clr-namespace:OnedrawHelper.Converters"
+        xmlns:b="clr-namespace:OnedrawHelper.Behaviors"
         Title="OnedrawHelper" WindowStyle="None" AllowsTransparency="True" SizeToContent="Height"
         Icon="../Resources/MainIcon.ico"
         Width="200">
@@ -79,6 +80,10 @@
     <WindowChrome.WindowChrome>
         <WindowChrome CaptionHeight="0" ResizeBorderThickness="5"/>
     </WindowChrome.WindowChrome>
+
+    <i:Interaction.Behaviors>
+        <b:SystemMenuBehavior CanMaximize="False"/>
+    </i:Interaction.Behaviors>
 
     <i:Interaction.Triggers>
 
