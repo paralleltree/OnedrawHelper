@@ -24,10 +24,8 @@ namespace OnedrawHelper.Models
             {
                 _nextChallenge = value;
                 RaisePropertyChanged();
-                if (this.ChallengeUpdated != null) this.ChallengeUpdated(this, null);
             }
         }
-        public event EventHandler ChallengeUpdated;
 
 
         public ThemeModel(Theme source)
@@ -39,8 +37,11 @@ namespace OnedrawHelper.Models
         public async Task UpdateNextChallengeAsync(Tokens tokens)
         {
             var c = await GetNextChallengeAsync(tokens);
-            if (c != null && (NextChallenge == null || c.StartTime < NextChallenge.StartTime))
-                NextChallenge = c;
+            if (c != null)
+            {
+                if (NextChallenge == null || c.StartTime != NextChallenge.StartTime)
+                    NextChallenge = c;
+            }
         }
 
         public async Task<Challenge> GetNextChallengeAsync(Tokens tokens)
@@ -69,7 +70,10 @@ namespace OnedrawHelper.Models
                     return new Challenge() { StartTime = start, Subjects = subjects, Rules = rules };
                 });
 
-            return challenges.OrderBy(p => p.StartTime).FirstOrDefault();
+            return challenges
+                .OrderBy(p => p.StartTime)
+                .SkipWhile(p => p.StartTime.AddHours(1) < DateTime.Now)
+                .FirstOrDefault();
         }
 
     }
