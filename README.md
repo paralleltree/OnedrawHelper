@@ -1,12 +1,13 @@
 # OnedrawHelper
 A helper for Onedrawers
 
-OnedrawHelperは、Twitter上で開催されるワンドロの補助を目的としたソフトウェアです。
+OnedrawHelperは、Twitter上で開催されるワンドロの補助を目的とする発展途上なソフトウェアです。
 
 ## 機能
  * 次回のワンドロのお題取得
 
 ## 導入/使い方
+ * ダウンロードは[こちら](https://github.com/paralleltree/OnedrawHelper/releases)、下部の緑色のボタンから行えます。
  * 適当なフォルダに展開して、OnedrawHelper.exeを実行してください。
  * 初回起動時にはTwitterへの認証が必要です。
   - ウィンドウ右下の赤いボタンから認証を行ってください。
