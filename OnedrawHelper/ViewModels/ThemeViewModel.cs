@@ -74,10 +74,12 @@ namespace OnedrawHelper.ViewModels
         public ThemeViewModel(ThemeModel source)
         {
             this.Source = source;
-            var listener = new EventListener<EventHandler>(
-                h => source.ChallengeUpdated += h,
-                h => source.ChallengeUpdated -= h,
-                (sender, e) => IsUpdated = true);
+            var listener = new PropertyChangedEventListener(Source,
+                (sender, e) =>
+                {
+                    if (e.PropertyName == "NextChallenge")
+                        IsUpdated = true;
+                });
             CompositeDisposable.Add(listener);
         }
 
