@@ -38,5 +38,10 @@ namespace OnedrawHelper.Views
                 this.MaxHeight = this.ActualHeight;
             };
         }
+
+        public void Flash()
+        {
+            this.BeginFlash();
+        }
     }
 }

@@ -107,9 +107,13 @@
         <l:InteractionMessageTrigger MessageKey="AuthorizeTwitter" Messenger="{Binding Messenger}">
             <l:TransitionInteractionMessageAction WindowType="{x:Type v:AuthorizeTwitterWindow}" Mode="Modal"/>
         </l:InteractionMessageTrigger>
+
+        <l:InteractionMessageTrigger MessageKey="FlashWindow" Messenger="{Binding Messenger}">
+            <l:LivetCallMethodAction MethodName="Flash" MethodTarget="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=Window}}"/>
+        </l:InteractionMessageTrigger>
     </i:Interaction.Triggers>
 
-    <Border Background="PaleGoldenrod" BorderBrush="{StaticResource ForegroundBrush}" BorderThickness="1">
+    <Border Background="LemonChiffon" BorderBrush="{StaticResource ForegroundBrush}" BorderThickness="1">
         <Grid Margin="1">
             <Grid.RowDefinitions>
                 <RowDefinition Height="Auto"/>
