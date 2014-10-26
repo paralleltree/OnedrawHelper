@@ -113,6 +113,7 @@ namespace OnedrawHelper.ViewModels
                                     {
                                         if (q.PropertyName == "IsUpdated")
                                         {
+                                            if (((ThemeViewModel)p).IsUpdated) Messenger.Raise(new InteractionMessage("FlashWindow"));
                                             CurrentTheme.IsUpdated = false;
                                             RaisePropertyChanged("IsUpdatedAny");
                                         }
