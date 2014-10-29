@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.ComponentModel;
+using System.Windows.Threading;
 
 using Livet;
 using Livet.Commands;
@@ -87,6 +88,7 @@ namespace OnedrawHelper.ViewModels
             }
         }
         public bool IsUpdatedAny { get { return CanMoveNextTheme() && Themes.Any(p => p.IsUpdated); } }
+        private DispatcherTimer RefreshTimer { get; set; }
 
         public void Initialize()
         {
@@ -136,6 +138,15 @@ namespace OnedrawHelper.ViewModels
             CompositeDisposable.Add(listener);
 
             model.Initialize();
+
+            RefreshTimer = new DispatcherTimer() { Interval = TimeSpan.FromMilliseconds(500) };
+            RefreshTimer.Tick += (sender, e) =>
+            {
+                if (CurrentTheme != null && CurrentTheme.NextChallenge != null)
+                    CurrentTheme.NextChallenge.Refresh();
+            };
+            RefreshTimer.Start();
+
         }
 
 

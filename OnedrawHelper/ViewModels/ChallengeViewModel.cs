@@ -16,7 +16,7 @@ using OnedrawHelper.Data;
 
 namespace OnedrawHelper.ViewModels
 {
-    public class ThemeViewModel : ViewModel
+    public class ChallengeViewModel : ViewModel
     {
         /* コマンド、プロパティの定義にはそれぞれ 
          * 
@@ -60,49 +60,78 @@ namespace OnedrawHelper.ViewModels
          * 自動的にUIDispatcher上での通知に変換されます。変更通知に際してUIDispatcherを操作する必要はありません。
          */
 
-        private ThemeModel Source { get; set; }
-        public Theme Theme { get { return Source.Theme; } }
-        private ChallengeViewModel _nextChallenge;
-        public ChallengeViewModel NextChallenge
+        public Challenge Source { get; private set; }
+        private ProgressState _progressStatus;
+        public ProgressState ProgressStatus
         {
-            get { return _nextChallenge; }
-            private set
-            {
-                if (_nextChallenge == value) return;
-                _nextChallenge = value;
-                RaisePropertyChanged();
-            }
-        }
-        private bool _isUpdated;
-        public bool IsUpdated
-        {
-            get { return _isUpdated; }
+            get { return _progressStatus; }
             set
             {
-                if (_isUpdated == value) return;
-                _isUpdated = value;
+                if (_progressStatus == value) return;
+                _progressStatus = value;
+                RaisePropertyChanged();
+                switch (ProgressStatus)
+                {
+                    case ProgressState.Waiting:
+                        TimeFormat = TimeFormatEnum.StartTime;
+                        break;
+                    case ProgressState.Progressing:
+                        TimeFormat = TimeFormatEnum.RemainingTime;
+                        break;
+                    case ProgressState.Ended:
+                        TimeFormat = TimeFormatEnum.StartTime;
+                        break;
+                }
+            }
+        }
+        private TimeFormatEnum _timeFormat;
+        public TimeFormatEnum TimeFormat
+        {
+            get { return _timeFormat; }
+            set
+            {
+                if (_timeFormat == value) return;
+                _timeFormat = value;
                 RaisePropertyChanged();
             }
         }
+        public TimeSpan RemainingTime { get { return Source.StartTime.AddHours(1) - DateTime.Now; } }
 
-        public ThemeViewModel(ThemeModel source)
+        public ChallengeViewModel(Challenge source)
         {
             this.Source = source;
-            var listener = new PropertyChangedEventListener(Source,
-                (sender, e) =>
-                {
-                    if (e.PropertyName == "NextChallenge")
-                    {
-                        NextChallenge = new ChallengeViewModel(((ThemeModel)sender).NextChallenge);
-                        IsUpdated = true;
-                    }
-                    RaisePropertyChanged(e.PropertyName);
-                });
-            CompositeDisposable.Add(listener);
         }
 
         public void Initialize()
         {
         }
+
+        public void Refresh()
+        {
+            var t = RemainingTime;
+            if (t.TotalSeconds < 0)
+                ProgressStatus = ProgressState.Ended;
+            else if (t < TimeSpan.FromHours(1))
+            {
+                ProgressStatus = ProgressState.Progressing;
+                RaisePropertyChanged("RemainingTime");
+            }
+            else
+                ProgressStatus = ProgressState.Waiting;
+
+        }
+    }
+
+    public enum TimeFormatEnum
+    {
+        StartTime = 0,
+        RemainingTime = 1
+    }
+
+    public enum ProgressState
+    {
+        Waiting,
+        Progressing,
+        Ended
     }
 }
