@@ -25,6 +25,7 @@
             <Setter Property="WindowChrome.IsHitTestVisibleInChrome" Value="True" />
             <Setter Property="Background" Value="{StaticResource ForegroundBrush}"/>
             <Setter Property="FocusVisualStyle" Value="{x:Null}" />
+            <Setter Property="IsTabStop" Value="False"/>
         </Style>
         <Style x:Key="CaptionButtonStyle" TargetType="Button" BasedOn="{StaticResource CaptionControlStyle}">
             <Setter Property="Template">
@@ -46,7 +47,7 @@
                                     <VisualState x:Name="MouseOver">
                                         <Storyboard>
                                             <DoubleAnimationUsingKeyFrames Storyboard.TargetProperty="(Control.Background).Opacity" Storyboard.TargetName="border">
-                                                <EasingDoubleKeyFrame KeyTime="0" Value="0.5"/>
+                                                <EasingDoubleKeyFrame KeyTime="0" Value="0.4"/>
                                             </DoubleAnimationUsingKeyFrames>
                                         </Storyboard>
                                     </VisualState>
@@ -207,7 +208,8 @@
             </StackPanel>
 
             <StackPanel Grid.Row="1" Orientation="Horizontal" HorizontalAlignment="Right">
-                <Button Command="{Binding AuthorizeTwitterCommand}" Content="o" ToolTip="Twitter認証"
+                <Button Content="o" ToolTip="Twitter認証" Margin="1,0,0,0"
+                        Command="{Binding AuthorizeTwitterCommand}"
                         Width="{Binding ActualHeight, RelativeSource={RelativeSource Self}}">
                     <Button.Style>
                         <Style TargetType="Button" BasedOn="{StaticResource CaptionButtonStyle}">
@@ -222,10 +224,12 @@
                         </Style>
                     </Button.Style>
                 </Button>
-                <CheckBox Style="{StaticResource CaptionCheckBoxStyle}" Content="f" ToolTip="最前面に表示"
+                <CheckBox Content="f" ToolTip="最前面に表示" Margin="1,0,0,0"
+                          Style="{StaticResource CaptionCheckBoxStyle}"
                           IsChecked="{Binding Topmost, Mode=TwoWay, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=Window}}"
                           Width="{Binding ActualHeight, RelativeSource={RelativeSource Self}}"/>
-                <Button Style="{StaticResource CaptionButtonStyle}" Content="0" ToolTip="最小化"
+                <Button Content="0" ToolTip="最小化" Margin="1,0,0,0"
+                        Style="{StaticResource CaptionButtonStyle}"
                         Width="{Binding ActualHeight, RelativeSource={RelativeSource Self}}">
                     <i:Interaction.Triggers>
                         <i:EventTrigger EventName="Click">
