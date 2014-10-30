@@ -222,6 +222,9 @@
                         </Style>
                     </Button.Style>
                 </Button>
+                <CheckBox Style="{StaticResource CaptionCheckBoxStyle}" Content="f" ToolTip="最前面に表示"
+                          IsChecked="{Binding Topmost, Mode=TwoWay, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=Window}}"
+                          Width="{Binding ActualHeight, RelativeSource={RelativeSource Self}}"/>
                 <Button Style="{StaticResource CaptionButtonStyle}" Content="0" ToolTip="最小化"
                         Width="{Binding ActualHeight, RelativeSource={RelativeSource Self}}">
                     <i:Interaction.Triggers>
