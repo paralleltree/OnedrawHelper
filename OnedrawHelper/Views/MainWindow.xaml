@@ -209,6 +209,9 @@
                                     <DataTrigger Binding="{Binding TimeFormat}" Value="{x:Static vm:TimeFormatEnum.StartTime}">
                                         <Setter Property="Text" Value="{Binding Source.StartTime, StringFormat=MM/dd HH:mm～}"/>
                                     </DataTrigger>
+                                    <DataTrigger Binding="{Binding TimeFormat}" Value="{x:Static vm:TimeFormatEnum.ElapsedTime}">
+                                        <Setter Property="Text" Value="{Binding ElapsedTime, StringFormat=mm\\:ss}"/>
+                                    </DataTrigger>
                                     <DataTrigger Binding="{Binding TimeFormat}" Value="{x:Static vm:TimeFormatEnum.RemainingTime}">
                                         <Setter Property="Text" Value="{Binding RemainingTime, StringFormat=mm\\:ss}"/>
                                     </DataTrigger>

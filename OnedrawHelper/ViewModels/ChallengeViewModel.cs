@@ -96,6 +96,7 @@ namespace OnedrawHelper.ViewModels
             }
         }
         public TimeSpan RemainingTime { get { return Source.StartTime.AddHours(1) - DateTime.Now; } }
+        public TimeSpan ElapsedTime { get { return DateTime.Now - Source.StartTime; } }
 
         public ChallengeViewModel(Challenge source)
         {
@@ -118,14 +119,14 @@ namespace OnedrawHelper.ViewModels
             }
             else
                 ProgressStatus = ProgressState.Waiting;
-
         }
     }
 
     public enum TimeFormatEnum
     {
         StartTime = 0,
-        RemainingTime = 1
+        ElapsedTime = 1,
+        RemainingTime = 2
     }
 
     public enum ProgressState
