@@ -91,6 +91,7 @@
     <Compile Include="Behaviors\SystemMenuBehavior.cs" />
     <Compile Include="Converters\InverseBooleanConverter.cs" />
     <Compile Include="Converters\StringCollectionAsFlatConverter.cs" />
+    <Compile Include="Converters\TimeSpanAsStringConverter.cs" />
     <Compile Include="Models\Model.cs" />
     <Compile Include="Models\ThemeModel.cs" />
     <Compile Include="ViewModels\AuthorizeTwitterWindowViewModel.cs" />
