@@ -34,17 +34,17 @@ namespace OnedrawHelper.Models
         }
         public bool IsAuthorized { get { return Token != null; } }
         public ObservableSynchronizedCollection<ThemeModel> Themes { get; private set; }
-        private DispatcherTimer Timer { get; set; }
+        private DispatcherTimer UpdateTimer { get; set; }
 
         private Model()
         {
             Themes = new ObservableSynchronizedCollection<ThemeModel>();
-            Timer = new DispatcherTimer() { Interval = TimeSpan.FromHours(2) };
+            UpdateTimer = new DispatcherTimer() { Interval = TimeSpan.FromHours(2) };
         }
 
         ~Model()
         {
-            Timer.Stop();
+            UpdateTimer.Stop();
             //File.WriteAllText(ThemesPath, JsonConvert.SerializeObject(Themes.Select(p => p.Source)));
             if (Token == null) return;
             File.WriteAllText(SettingPath, JsonConvert.SerializeObject(new Dictionary<string, string>()
@@ -75,8 +75,8 @@ namespace OnedrawHelper.Models
             }
 
             UpdateThemes();
-            Timer.Tick += (sender, e) => UpdateThemes();
-            Timer.Start();
+            UpdateTimer.Tick += (sender, e) => UpdateThemes();
+            UpdateTimer.Start();
         }
 
         #region Singleton

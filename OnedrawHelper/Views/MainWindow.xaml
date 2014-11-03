@@ -19,6 +19,7 @@
     <Window.Resources>
         <SolidColorBrush x:Key="ForegroundBrush" Color="Chocolate"/>
         <conv:StringCollectionAsFlatConverter x:Key="StringCollectionAsFlatConverter"/>
+        <conv:TimeSpanAsStringConverter x:Key="TimeSpanAsStringConverter"/>
         <Style x:Key="CaptionControlStyle" TargetType="Control">
             <Setter Property="OverridesDefaultStyle" Value="True"/>
             <Setter Property="FontFamily" Value="Marlett"/>
@@ -172,8 +173,8 @@
                 <RowDefinition Height="Auto"/>
             </Grid.RowDefinitions>
 
-            <StackPanel DataContext="{Binding CurrentTheme.Source}">
-                <StackPanel DataContext="{Binding Source}">
+            <StackPanel DataContext="{Binding CurrentTheme}">
+                <StackPanel DataContext="{Binding Theme}">
                     <Grid>
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition Width="*"/>
@@ -200,10 +201,38 @@
                     </Grid>
                 </StackPanel>
                 <StackPanel DataContext="{Binding NextChallenge}">
-                    <TextBlock Text="{Binding Subjects, StringFormat=お題 {0}, Converter={StaticResource StringCollectionAsFlatConverter}}"
+                    <TextBlock Text="{Binding Source.Subjects, StringFormat=お題 {0}, Converter={StaticResource StringCollectionAsFlatConverter}}"
                                Foreground="{StaticResource ForegroundBrush}" HorizontalAlignment="Center"/>
-                    <TextBlock Text="{Binding StartTime, StringFormat=MM/dd HH:mm～}" FontWeight="Bold"
-                               Foreground="{StaticResource ForegroundBrush}" HorizontalAlignment="Center"/>
+                    <TextBlock FontWeight="Bold" HorizontalAlignment="Center">
+                        <TextBlock.InputBindings>
+                            <MouseBinding MouseAction="LeftClick" Command="{Binding ChangeTimeFormatCommand}"/>
+                        </TextBlock.InputBindings>
+                        <TextBlock.Style>
+                            <Style TargetType="TextBlock">
+                                <Style.Triggers>
+                                    <DataTrigger Binding="{Binding TimeFormat}" Value="{x:Static vm:TimeFormatEnum.StartTime}">
+                                        <Setter Property="Text" Value="{Binding Source.StartTime, StringFormat=MM/dd HH:mm～}"/>
+                                    </DataTrigger>
+                                    <DataTrigger Binding="{Binding TimeFormat}" Value="{x:Static vm:TimeFormatEnum.ElapsedTime}">
+                                        <Setter Property="Text" Value="{Binding ElapsedTime, Converter={StaticResource TimeSpanAsStringConverter}}"/>
+                                    </DataTrigger>
+                                    <DataTrigger Binding="{Binding TimeFormat}" Value="{x:Static vm:TimeFormatEnum.RemainingTime}">
+                                        <Setter Property="Text" Value="{Binding RemainingTime, Converter={StaticResource TimeSpanAsStringConverter}}"/>
+                                    </DataTrigger>
+
+                                    <DataTrigger Binding="{Binding ProgressStatus}" Value="{x:Static vm:ProgressState.Waiting}">
+                                        <Setter Property="Foreground" Value="{StaticResource ForegroundBrush}"/>
+                                    </DataTrigger>
+                                    <DataTrigger Binding="{Binding ProgressStatus}" Value="{x:Static vm:ProgressState.Progressing}">
+                                        <Setter Property="Foreground" Value="{StaticResource ForegroundBrush}"/>
+                                    </DataTrigger>
+                                    <DataTrigger Binding="{Binding ProgressStatus}" Value="{x:Static vm:ProgressState.Ended}">
+                                        <Setter Property="Foreground" Value="DimGray"/>
+                                    </DataTrigger>
+                                </Style.Triggers>
+                            </Style>
+                        </TextBlock.Style>
+                    </TextBlock>
                 </StackPanel>
             </StackPanel>
 
