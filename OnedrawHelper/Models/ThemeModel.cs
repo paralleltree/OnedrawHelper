@@ -15,7 +15,7 @@ namespace OnedrawHelper.Models
         /*
          * NotificationObjectはプロパティ変更通知の仕組みを実装したオブジェクトです。
          */
-        public Theme Source { get; private set; }
+        public Theme Theme { get; private set; }
         private Challenge _nextChallenge;
         public Challenge NextChallenge
         {
@@ -30,7 +30,7 @@ namespace OnedrawHelper.Models
 
         public ThemeModel(Theme source)
         {
-            this.Source = source;
+            this.Theme = source;
         }
 
 
@@ -46,13 +46,13 @@ namespace OnedrawHelper.Models
 
         public async Task<Challenge> GetNextChallengeAsync(Tokens tokens)
         {
-            var statuses = await tokens.Statuses.UserTimelineAsync(screen_name => Source.SourceScreenName, include_rts => false);
+            var statuses = await tokens.Statuses.UserTimelineAsync(screen_name => Theme.SourceScreenName, include_rts => false);
             var challenges = statuses.Select(p =>
                 new
                 {
-                    MatchDate = Regex.Match(p.Text, Source.Extractor.DateExtractPattern, RegexOptions.Multiline),
-                    MatchSubjects = Regex.Match(p.Text, Source.Extractor.SubjectsExtractPattern, RegexOptions.Multiline),
-                    MatchRules = Regex.Match(p.Text, Source.Extractor.RulesExtractPattern, RegexOptions.Multiline),
+                    MatchDate = Regex.Match(p.Text, Theme.Extractor.DateExtractPattern, RegexOptions.Multiline),
+                    MatchSubjects = Regex.Match(p.Text, Theme.Extractor.SubjectsExtractPattern, RegexOptions.Multiline),
+                    MatchRules = Regex.Match(p.Text, Theme.Extractor.RulesExtractPattern, RegexOptions.Multiline),
                     CreatedAt = p.CreatedAt
                 })
                 .Where(p => p.MatchDate.Success)
@@ -65,8 +65,8 @@ namespace OnedrawHelper.Models
                         int.Parse(p.MatchDate.Groups["hour"].Value),
                         int.Parse(p.MatchDate.Groups["min"].Value), 0);
 
-                    var subjects = Regex.Split(p.MatchSubjects.Groups["subjects"].Value, Source.Extractor.SubjectsSplitPattern).Where(q => !string.IsNullOrWhiteSpace(q)).ToList();
-                    var rules = Regex.Split(p.MatchRules.Groups["rules"].Value, Source.Extractor.RulesSplitPattern).Where(q => !string.IsNullOrWhiteSpace(q)).ToList();
+                    var subjects = Regex.Split(p.MatchSubjects.Groups["subjects"].Value, Theme.Extractor.SubjectsSplitPattern).Where(q => !string.IsNullOrWhiteSpace(q)).ToList();
+                    var rules = Regex.Split(p.MatchRules.Groups["rules"].Value, Theme.Extractor.RulesSplitPattern).Where(q => !string.IsNullOrWhiteSpace(q)).ToList();
                     return new Challenge() { StartTime = start, Subjects = subjects, Rules = rules };
                 });
 

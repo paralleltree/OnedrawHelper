@@ -32,11 +32,16 @@ namespace OnedrawHelper.Views
             InitializeComponent();
             this.MouseLeftButtonDown += (sender, e) => this.DragMove();
             this.SizeChanged += (sender, e) =>
-               {
-                   this.SizeToContent = SizeToContent.Height;
-                   this.MinHeight = this.ActualHeight;
-                   this.MaxHeight = this.ActualHeight;
-               };
+            {
+                this.SizeToContent = SizeToContent.Height;
+                this.MinHeight = this.ActualHeight;
+                this.MaxHeight = this.ActualHeight;
+            };
+        }
+
+        public void Flash()
+        {
+            this.BeginFlash();
         }
     }
 }

@@ -16,7 +16,7 @@ using OnedrawHelper.Data;
 
 namespace OnedrawHelper.ViewModels
 {
-    public class ThemeViewModel : ViewModel
+    public class ChallengeViewModel : ViewModel
     {
         /* コマンド、プロパティの定義にはそれぞれ 
          * 
@@ -60,49 +60,118 @@ namespace OnedrawHelper.ViewModels
          * 自動的にUIDispatcher上での通知に変換されます。変更通知に際してUIDispatcherを操作する必要はありません。
          */
 
-        private ThemeModel Source { get; set; }
-        public Theme Theme { get { return Source.Theme; } }
-        private ChallengeViewModel _nextChallenge;
-        public ChallengeViewModel NextChallenge
+        public Challenge Source { get; private set; }
+        private ProgressState _progressStatus;
+        public ProgressState ProgressStatus
         {
-            get { return _nextChallenge; }
-            private set
-            {
-                if (_nextChallenge == value) return;
-                _nextChallenge = value;
-                RaisePropertyChanged();
-            }
-        }
-        private bool _isUpdated;
-        public bool IsUpdated
-        {
-            get { return _isUpdated; }
+            get { return _progressStatus; }
             set
             {
-                if (_isUpdated == value) return;
-                _isUpdated = value;
+                if (_progressStatus == value) return;
+                _progressStatus = value;
+                RaisePropertyChanged();
+                switch (ProgressStatus)
+                {
+                    case ProgressState.Waiting:
+                        TimeFormat = TimeFormatEnum.StartTime;
+                        break;
+                    case ProgressState.Progressing:
+                        if (TimeFormat != TimeFormatEnum.StartTime) return;
+                        TimeFormat = TimeFormatEnum.RemainingTime;
+                        break;
+                    case ProgressState.Ended:
+                        //TimeFormat = TimeFormatEnum.StartTime;
+                        break;
+                }
+            }
+        }
+        private TimeFormatEnum _timeFormat;
+        public TimeFormatEnum TimeFormat
+        {
+            get { return _timeFormat; }
+            set
+            {
+                if (_timeFormat == value) return;
+                _timeFormat = value;
                 RaisePropertyChanged();
             }
         }
+        public TimeSpan ElapsedTime { get { return DateTime.Now - Source.StartTime; } }
+        public TimeSpan RemainingTime { get { return Source.StartTime.AddHours(1) - DateTime.Now; } }
 
-        public ThemeViewModel(ThemeModel source)
+        public ChallengeViewModel(Challenge source)
         {
             this.Source = source;
-            var listener = new PropertyChangedEventListener(Source,
-                (sender, e) =>
-                {
-                    if (e.PropertyName == "NextChallenge")
-                    {
-                        NextChallenge = new ChallengeViewModel(((ThemeModel)sender).NextChallenge);
-                        IsUpdated = true;
-                    }
-                    RaisePropertyChanged(e.PropertyName);
-                });
-            CompositeDisposable.Add(listener);
         }
 
         public void Initialize()
         {
         }
+
+
+        #region ChangeTimeFormatCommand
+        private ViewModelCommand _ChangeTimeFormatCommand;
+
+        public ViewModelCommand ChangeTimeFormatCommand
+        {
+            get
+            {
+                if (_ChangeTimeFormatCommand == null)
+                {
+                    _ChangeTimeFormatCommand = new ViewModelCommand(ChangeTimeFormat);
+                }
+                return _ChangeTimeFormatCommand;
+            }
+        }
+
+        public void ChangeTimeFormat()
+        {
+            switch (TimeFormat)
+            {
+                case TimeFormatEnum.StartTime:
+                    TimeFormat = TimeFormatEnum.ElapsedTime;
+                    break;
+
+                case TimeFormatEnum.ElapsedTime:
+                    if (ProgressStatus == ProgressState.Waiting)
+                        TimeFormat = TimeFormatEnum.StartTime;
+                    else
+                        TimeFormat = TimeFormatEnum.RemainingTime;
+                    break;
+
+                case TimeFormatEnum.RemainingTime:
+                    TimeFormat = TimeFormatEnum.StartTime;
+                    break;
+            }
+        }
+        #endregion
+
+
+        public void Refresh()
+        {
+            var t = RemainingTime;
+            if (t.TotalSeconds < 0)
+                ProgressStatus = ProgressState.Ended;
+            else if (t < TimeSpan.FromHours(1))
+                ProgressStatus = ProgressState.Progressing;
+            else
+                ProgressStatus = ProgressState.Waiting;
+            RaisePropertyChanged("RemainingTime");
+            RaisePropertyChanged("ElapsedTime");
+        }
+    }
+
+    public enum TimeFormatEnum
+    {
+        StartTime = 0,
+        ElapsedTime = 1,
+        RemainingTime = 2
+    }
+
+    public enum ProgressState
+    {
+        Waiting,
+        Progressing,
+        Ended
     }
 }
