@@ -19,6 +19,7 @@
     <Window.Resources>
         <SolidColorBrush x:Key="ForegroundBrush" Color="Chocolate"/>
         <conv:StringCollectionAsFlatConverter x:Key="StringCollectionAsFlatConverter"/>
+        <conv:TimeSpanAsStringConverter x:Key="TimeSpanAsStringConverter"/>
         <Style x:Key="CaptionControlStyle" TargetType="Control">
             <Setter Property="OverridesDefaultStyle" Value="True"/>
             <Setter Property="FontFamily" Value="Marlett"/>
@@ -203,6 +204,9 @@
                     <TextBlock Text="{Binding Source.Subjects, StringFormat=お題 {0}, Converter={StaticResource StringCollectionAsFlatConverter}}"
                                Foreground="{StaticResource ForegroundBrush}" HorizontalAlignment="Center"/>
                     <TextBlock FontWeight="Bold" HorizontalAlignment="Center">
+                        <TextBlock.InputBindings>
+                            <MouseBinding MouseAction="LeftClick" Command="{Binding ChangeTimeFormatCommand}"/>
+                        </TextBlock.InputBindings>
                         <TextBlock.Style>
                             <Style TargetType="TextBlock">
                                 <Style.Triggers>
@@ -210,10 +214,10 @@
                                         <Setter Property="Text" Value="{Binding Source.StartTime, StringFormat=MM/dd HH:mm～}"/>
                                     </DataTrigger>
                                     <DataTrigger Binding="{Binding TimeFormat}" Value="{x:Static vm:TimeFormatEnum.ElapsedTime}">
-                                        <Setter Property="Text" Value="{Binding ElapsedTime, StringFormat=mm\\:ss}"/>
+                                        <Setter Property="Text" Value="{Binding ElapsedTime, Converter={StaticResource TimeSpanAsStringConverter}}"/>
                                     </DataTrigger>
                                     <DataTrigger Binding="{Binding TimeFormat}" Value="{x:Static vm:TimeFormatEnum.RemainingTime}">
-                                        <Setter Property="Text" Value="{Binding RemainingTime, StringFormat=mm\\:ss}"/>
+                                        <Setter Property="Text" Value="{Binding RemainingTime, Converter={StaticResource TimeSpanAsStringConverter}}"/>
                                     </DataTrigger>
 
                                     <DataTrigger Binding="{Binding ProgressStatus}" Value="{x:Static vm:ProgressState.Waiting}">
@@ -223,7 +227,7 @@
                                         <Setter Property="Foreground" Value="{StaticResource ForegroundBrush}"/>
                                     </DataTrigger>
                                     <DataTrigger Binding="{Binding ProgressStatus}" Value="{x:Static vm:ProgressState.Ended}">
-                                        <Setter Property="Foreground" Value="DarkGray"/>
+                                        <Setter Property="Foreground" Value="DimGray"/>
                                     </DataTrigger>
                                 </Style.Triggers>
                             </Style>

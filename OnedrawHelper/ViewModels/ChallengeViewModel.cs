@@ -76,10 +76,11 @@ namespace OnedrawHelper.ViewModels
                         TimeFormat = TimeFormatEnum.StartTime;
                         break;
                     case ProgressState.Progressing:
+                        if (TimeFormat != TimeFormatEnum.StartTime) return;
                         TimeFormat = TimeFormatEnum.RemainingTime;
                         break;
                     case ProgressState.Ended:
-                        TimeFormat = TimeFormatEnum.StartTime;
+                        //TimeFormat = TimeFormatEnum.StartTime;
                         break;
                 }
             }
@@ -95,8 +96,8 @@ namespace OnedrawHelper.ViewModels
                 RaisePropertyChanged();
             }
         }
-        public TimeSpan RemainingTime { get { return Source.StartTime.AddHours(1) - DateTime.Now; } }
         public TimeSpan ElapsedTime { get { return DateTime.Now - Source.StartTime; } }
+        public TimeSpan RemainingTime { get { return Source.StartTime.AddHours(1) - DateTime.Now; } }
 
         public ChallengeViewModel(Challenge source)
         {
@@ -107,18 +108,56 @@ namespace OnedrawHelper.ViewModels
         {
         }
 
+
+        #region ChangeTimeFormatCommand
+        private ViewModelCommand _ChangeTimeFormatCommand;
+
+        public ViewModelCommand ChangeTimeFormatCommand
+        {
+            get
+            {
+                if (_ChangeTimeFormatCommand == null)
+                {
+                    _ChangeTimeFormatCommand = new ViewModelCommand(ChangeTimeFormat);
+                }
+                return _ChangeTimeFormatCommand;
+            }
+        }
+
+        public void ChangeTimeFormat()
+        {
+            switch (TimeFormat)
+            {
+                case TimeFormatEnum.StartTime:
+                    TimeFormat = TimeFormatEnum.ElapsedTime;
+                    break;
+
+                case TimeFormatEnum.ElapsedTime:
+                    if (ProgressStatus == ProgressState.Waiting)
+                        TimeFormat = TimeFormatEnum.StartTime;
+                    else
+                        TimeFormat = TimeFormatEnum.RemainingTime;
+                    break;
+
+                case TimeFormatEnum.RemainingTime:
+                    TimeFormat = TimeFormatEnum.StartTime;
+                    break;
+            }
+        }
+        #endregion
+
+
         public void Refresh()
         {
             var t = RemainingTime;
             if (t.TotalSeconds < 0)
                 ProgressStatus = ProgressState.Ended;
             else if (t < TimeSpan.FromHours(1))
-            {
                 ProgressStatus = ProgressState.Progressing;
-                RaisePropertyChanged("RemainingTime");
-            }
             else
                 ProgressStatus = ProgressState.Waiting;
+            RaisePropertyChanged("RemainingTime");
+            RaisePropertyChanged("ElapsedTime");
         }
     }
 
