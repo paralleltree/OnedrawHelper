@@ -5,6 +5,7 @@ OnedrawHelperは、Twitter上で開催されるワンドロの補助を目的と
 
 ## 機能
  * 次回のワンドロのお題取得
+ * 経過時間, 残り時間の表示, 切り替え
 
 ## 導入/使い方
  * ダウンロードは[こちら](https://github.com/paralleltree/OnedrawHelper/releases)、下部の緑色のボタンから行えます。
@@ -78,3 +79,5 @@ Json.NET
 > CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 ----
+
+(C) 2014 paralleltree
