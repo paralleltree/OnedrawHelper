@@ -94,7 +94,13 @@ namespace OnedrawHelper.Models
 
         private void UpdateThemes()
         {
+            try
+            {
+                Token.Account.VerifyCredentials();
+            }
+            catch { Token = null; }
             if (Token == null) return;
+
             Task.Run(async () =>
             {
                 foreach (var t in Themes)
@@ -124,6 +130,19 @@ namespace OnedrawHelper.Models
                     return false;
                 }
             });
+        }
+
+        public async Task<bool> UpdateStatus(string text, IEnumerable<string> paths)
+        {
+            if (Token == null) throw new InvalidOperationException("Twitterへの認証が行われていません。");
+            var result = await Task.WhenAll(paths.Select(p => Token.Media.UploadAsync(media => new FileInfo(p))));
+
+            try
+            {
+                var s = await Token.Statuses.UpdateWithMediaAsync(status => text, media => result.Select(p => p.MediaId));
+            }
+            catch { return false; }
+            return true;
         }
         #endregion
 

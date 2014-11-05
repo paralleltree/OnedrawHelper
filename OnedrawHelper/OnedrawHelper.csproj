@@ -25,6 +25,7 @@
     <DefineConstants>DEBUG;TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
+    <UseVSHostingProcess>true</UseVSHostingProcess>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|x86' ">
     <DebugType>pdbonly</DebugType>
@@ -88,6 +89,7 @@
       <DependentUpon>App.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="Behaviors\AcceptDropBehavior.cs" />
     <Compile Include="Behaviors\SystemMenuBehavior.cs" />
     <Compile Include="Converters\InverseBooleanConverter.cs" />
     <Compile Include="Converters\StringCollectionAsFlatConverter.cs" />
@@ -98,6 +100,7 @@
     <Compile Include="ViewModels\ChallengeViewModel.cs" />
     <Compile Include="ViewModels\MainWindowViewModel.cs" />
     <Compile Include="ViewModels\ThemeViewModel.cs" />
+    <Compile Include="ViewModels\UpdateStatusViewModel.cs" />
     <Compile Include="Views\AuthorizeTwitterWindow.xaml.cs">
       <DependentUpon>AuthorizeTwitterWindow.xaml</DependentUpon>
     </Compile>
