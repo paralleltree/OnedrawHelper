@@ -204,6 +204,32 @@ namespace OnedrawHelper.ViewModels
         }
         #endregion
 
+        #region UpdateStatusCommand
+        private ViewModelCommand _UpdateStatusCommand;
+
+        public ViewModelCommand UpdateStatusCommand
+        {
+            get
+            {
+                if (_UpdateStatusCommand == null)
+                {
+                    _UpdateStatusCommand = new ViewModelCommand(UpdateStatus, CanUpdateStatus);
+                }
+                return _UpdateStatusCommand;
+            }
+        }
+
+        public bool CanUpdateStatus()
+        {
+            return CurrentTheme != null && IsAuthorized;
+        }
+
+        public void UpdateStatus()
+        {
+            Messenger.Raise(new TransitionMessage(new UpdateStatusViewModel(this.model, CurrentTheme.Theme, model.TwitterConfigrations), "UpdateStatus"));
+        }
+        #endregion
+
 
         protected override void Dispose(bool disposing)
         {

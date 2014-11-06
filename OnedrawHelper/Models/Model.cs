@@ -20,6 +20,7 @@ namespace OnedrawHelper.Models
          */
         private readonly string ThemesPath = "themes.json";
         private readonly string SettingPath = "settings.json";
+        public CoreTweet.Configurations TwitterConfigrations { get; private set; }
 
         private Tokens _token;
         private Tokens Token
@@ -29,6 +30,7 @@ namespace OnedrawHelper.Models
             {
                 if (_token == value) return;
                 _token = value;
+                TwitterConfigrations = Token.Help.Configuration();
                 RaisePropertyChanged("IsAuthorized");
             }
         }

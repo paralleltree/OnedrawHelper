@@ -64,20 +64,38 @@ namespace OnedrawHelper.ViewModels
 
         private Model model { get; set; }
         private Theme Theme { get; set; }
-        public string Text { get; set; }
-        public ObservableSynchronizedCollection<string> Paths { get; set; }
+        private string _text;
+        public string Text
+        {
+            get { return _text; }
+            set
+            {
+                if (_text == value) return;
+                _text = value;
+                RaisePropertyChanged("RemainingLength");
+            }
+        }
+        public ObservableSynchronizedCollection<string> Paths { get; private set; }
+        public int RemainingLength { get { return 140 - Text.Length - TwitterConfigrations.CharactersReservedPerMedia; } }
+        private readonly CoreTweet.Configurations TwitterConfigrations;
 
         public UpdateStatusViewModel(Model model, Theme theme, CoreTweet.Configurations config)
+            : this(model, theme, config, Enumerable.Empty<string>())
+        {
+        }
+
+        public UpdateStatusViewModel(Model model, Theme theme, CoreTweet.Configurations config, IEnumerable<string> paths)
         {
             this.model = model;
             this.Theme = theme;
+            this.TwitterConfigrations = config;
             Text = string.Format(" {0}{1}", theme.HashTag.Substring(0, 1) == "#" ? "" : "#", theme.HashTag);
+            Paths = new ObservableSynchronizedCollection<string>(paths);
         }
 
         public void Initialize()
         {
         }
-
 
     }
 }
