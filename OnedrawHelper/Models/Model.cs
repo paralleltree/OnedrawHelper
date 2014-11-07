@@ -30,16 +30,20 @@ namespace OnedrawHelper.Models
             {
                 if (_token == value) return;
                 _token = value;
-                if (Token != null)
-                    TwitterConfigrations = Token.Help.Configuration();
 
-                try
+                Task.Run(() =>
                 {
-                    AuthorizedUser = Token.Account.VerifyCredentials(include_entities => false, skip_status => true);
-                }
-                catch { AuthorizedUser = null; }
-                RaisePropertyChanged("IsAuthorized");
-                RaisePropertyChanged("AuthorizedUser");
+                    if (Token != null)
+                        TwitterConfigrations = Token.Help.Configuration();
+
+                    try
+                    {
+                        AuthorizedUser = Token.Account.VerifyCredentials(include_entities => false, skip_status => true);
+                    }
+                    catch { AuthorizedUser = null; }
+                    RaisePropertyChanged("IsAuthorized");
+                    RaisePropertyChanged("AuthorizedUser");
+                });
             }
         }
         public bool IsAuthorized { get { return Token != null; } }
@@ -75,19 +79,25 @@ namespace OnedrawHelper.Models
                     Themes.Add(item);
             }
 
-            if (File.Exists(SettingPath))
-            {
-                var settings = JsonConvert.DeserializeObject<Dictionary<string, string>>(File.ReadAllText(SettingPath));
-                try
-                {
-                    Token = Tokens.Create(Properties.Resources.ConsumerKey, Properties.Resources.ConsumerSecret, settings["AccessToken"], settings["AccessTokenSecret"]);
-                }
-                catch { }
-            }
+            UpdateTimer.Tick += async (sender, e) => await UpdateThemes();
 
-            UpdateThemes();
-            UpdateTimer.Tick += (sender, e) => UpdateThemes();
-            UpdateTimer.Start();
+            Task.Run(() =>
+            {
+                if (File.Exists(SettingPath))
+                {
+                    var settings = JsonConvert.DeserializeObject<Dictionary<string, string>>(File.ReadAllText(SettingPath));
+                    try
+                    {
+                        Token = Tokens.Create(Properties.Resources.ConsumerKey, Properties.Resources.ConsumerSecret, settings["AccessToken"], settings["AccessTokenSecret"]);
+                    }
+                    catch { }
+                }
+            })
+            .ContinueWith(async t =>
+            {
+                await UpdateThemes();
+                UpdateTimer.Start();
+            });
         }
 
         #region Singleton
@@ -103,20 +113,17 @@ namespace OnedrawHelper.Models
         #endregion
 
 
-        private void UpdateThemes()
+        private async Task UpdateThemes()
         {
             try
             {
-                Token.Account.VerifyCredentials();
+                await Token.Account.VerifyCredentialsAsync();
             }
             catch { Token = null; }
             if (Token == null) return;
 
-            Task.Run(async () =>
-            {
-                foreach (var t in Themes)
-                    await t.UpdateNextChallengeAsync(Token);
-            });
+            foreach (var t in Themes)
+                await t.UpdateNextChallengeAsync(Token);
         }
 
         #region Twitter

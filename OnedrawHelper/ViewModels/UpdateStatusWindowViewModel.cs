@@ -193,7 +193,7 @@ namespace OnedrawHelper.ViewModels
             return RemainingLength < 140 && RemainingLength >= 0;
         }
 
-        public void UpdateStatus()
+        public async void UpdateStatus()
         {
             var deleted = Paths.Where(p => !System.IO.File.Exists(p));
             if (deleted.Count() > 0)
@@ -205,16 +205,14 @@ namespace OnedrawHelper.ViewModels
             }
 
             IsSending = true;
-            Task.Run(async () =>
-            {
-                bool succeed = await model.UpdateStatus(Text, Paths);
-                if (succeed)
-                    Messenger.Raise(new InteractionMessage("Close"));
-                else
-                    Messenger.Raise(new InformationMessage("ツイートの送信に失敗しました。", "ツイート送信エラー", System.Windows.MessageBoxImage.Error, "InformationMessage"));
 
-                IsSending = false;
-            });
+            bool succeed = await model.UpdateStatus(Text, Paths);
+            if (succeed)
+                Messenger.Raise(new InteractionMessage("Close"));
+            else
+                Messenger.Raise(new InformationMessage("ツイートの送信に失敗しました。", "ツイート送信エラー", System.Windows.MessageBoxImage.Error, "InformationMessage"));
+
+            IsSending = false;
 
         }
         #endregion
