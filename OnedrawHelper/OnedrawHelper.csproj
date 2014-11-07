@@ -100,7 +100,7 @@
     <Compile Include="ViewModels\ChallengeViewModel.cs" />
     <Compile Include="ViewModels\MainWindowViewModel.cs" />
     <Compile Include="ViewModels\ThemeViewModel.cs" />
-    <Compile Include="ViewModels\UpdateStatusViewModel.cs" />
+    <Compile Include="ViewModels\UpdateStatusWindowViewModel.cs" />
     <Compile Include="Views\AuthorizeTwitterWindow.xaml.cs">
       <DependentUpon>AuthorizeTwitterWindow.xaml</DependentUpon>
     </Compile>

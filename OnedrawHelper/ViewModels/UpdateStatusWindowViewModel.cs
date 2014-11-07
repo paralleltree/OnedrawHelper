@@ -18,7 +18,7 @@ using CoreTweet;
 
 namespace OnedrawHelper.ViewModels
 {
-    public class UpdateStatusViewModel : ViewModel
+    public class UpdateStatusWindowViewModel : ViewModel
     {
         /* コマンド、プロパティの定義にはそれぞれ 
          * 
@@ -73,18 +73,19 @@ namespace OnedrawHelper.ViewModels
                 if (_text == value) return;
                 _text = value;
                 RaisePropertyChanged("RemainingLength");
+                UpdateStatusCommand.RaiseCanExecuteChanged();
             }
         }
         public ObservableSynchronizedCollection<string> Paths { get; private set; }
         public int RemainingLength { get { return 140 - Text.Length - TwitterConfigrations.CharactersReservedPerMedia; } }
         private readonly CoreTweet.Configurations TwitterConfigrations;
 
-        public UpdateStatusViewModel(Model model, Theme theme, CoreTweet.Configurations config)
+        public UpdateStatusWindowViewModel(Model model, Theme theme, CoreTweet.Configurations config)
             : this(model, theme, config, Enumerable.Empty<string>())
         {
         }
 
-        public UpdateStatusViewModel(Model model, Theme theme, CoreTweet.Configurations config, IEnumerable<string> paths)
+        public UpdateStatusWindowViewModel(Model model, Theme theme, CoreTweet.Configurations config, IEnumerable<string> paths)
         {
             this.model = model;
             this.Theme = theme;
@@ -97,5 +98,39 @@ namespace OnedrawHelper.ViewModels
         {
         }
 
+
+        #region UpdateStatusCommand
+        private ViewModelCommand _UpdateStatusCommand;
+
+        public ViewModelCommand UpdateStatusCommand
+        {
+            get
+            {
+                if (_UpdateStatusCommand == null)
+                {
+                    _UpdateStatusCommand = new ViewModelCommand(UpdateStatus, CanUpdateStatus);
+                }
+                return _UpdateStatusCommand;
+            }
+        }
+
+        public bool CanUpdateStatus()
+        {
+            return RemainingLength >= 0;
+        }
+
+        public void UpdateStatus()
+        {
+            Task.Run(async () =>
+            {
+                bool succeed = await model.UpdateStatus(Text, Paths);
+                if (succeed)
+                    Messenger.Raise(new WindowActionMessage(WindowAction.Close));
+                else
+                    Messenger.Raise(new InformationMessage("ツイートの送信に失敗しました。", "ツイート送信エラー", System.Windows.MessageBoxImage.Error, "InformationMessage"));
+            });
+
+        }
+        #endregion
     }
 }

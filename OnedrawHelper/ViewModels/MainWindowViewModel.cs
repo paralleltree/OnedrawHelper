@@ -226,7 +226,7 @@ namespace OnedrawHelper.ViewModels
 
         public void UpdateStatus()
         {
-            Messenger.Raise(new TransitionMessage(new UpdateStatusViewModel(this.model, CurrentTheme.Theme, model.TwitterConfigrations), "UpdateStatus"));
+            Messenger.Raise(new TransitionMessage(new UpdateStatusWindowViewModel(this.model, CurrentTheme.Theme, model.TwitterConfigrations), "UpdateStatus"));
         }
         #endregion
 
