@@ -178,7 +178,7 @@ namespace OnedrawHelper.ViewModels
                 if (result)
                     this.Messenger.Raise(new InteractionMessage("Close"));
                 else
-                    this.Messenger.Raise(new InformationMessage("認証に失敗しました。\nPINコードを再度確認してください。", "認証エラー", System.Windows.MessageBoxImage.Error, "AuthorizeError"));
+                    this.Messenger.Raise(new InformationMessage("認証に失敗しました。\nPINコードを再度確認してください。", "認証エラー", System.Windows.MessageBoxImage.Error, "InformationMessage"));
             });
         }
         #endregion
