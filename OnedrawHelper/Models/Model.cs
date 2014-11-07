@@ -30,7 +30,8 @@ namespace OnedrawHelper.Models
             {
                 if (_token == value) return;
                 _token = value;
-                TwitterConfigrations = Token.Help.Configuration();
+                if (Token != null)
+                    TwitterConfigrations = Token.Help.Configuration();
                 RaisePropertyChanged("IsAuthorized");
             }
         }
