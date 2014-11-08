@@ -132,6 +132,7 @@ namespace OnedrawHelper.ViewModels
                 {
                     case "IsAuthorized":
                         RaisePropertyChanged("IsAuthorized");
+                        UpdateStatusCommand.RaiseCanExecuteChanged();
                         break;
                 }
             });
@@ -226,7 +227,7 @@ namespace OnedrawHelper.ViewModels
 
         public void UpdateStatus()
         {
-            Messenger.Raise(new TransitionMessage(new UpdateStatusWindowViewModel(this.model, CurrentTheme.Theme, model.TwitterConfigrations), "UpdateStatus"));
+            Messenger.Raise(new TransitionMessage(new UpdateStatusWindowViewModel(this.model, CurrentTheme.Theme, model.AuthorizedUser, model.TwitterConfigrations), "UpdateStatus"));
         }
         #endregion
 

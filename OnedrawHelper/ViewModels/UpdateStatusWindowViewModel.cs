@@ -78,17 +78,40 @@ namespace OnedrawHelper.ViewModels
         }
         public ObservableSynchronizedCollection<string> Paths { get; private set; }
         public int RemainingLength { get { return 140 - Text.Length - TwitterConfigrations.CharactersReservedPerMedia; } }
+        private CoreTweet.User _authorizedUser;
+        public CoreTweet.User AuthorizedUser
+        {
+            get { return _authorizedUser; }
+            private set
+            {
+                if (_authorizedUser == value) return;
+                _authorizedUser = value;
+                RaisePropertyChanged();
+            }
+        }
         private readonly CoreTweet.Configurations TwitterConfigrations;
+        private bool _isSending;
+        public bool IsSending
+        {
+            get { return _isSending; }
+            private set
+            {
+                if (_isSending == value) return;
+                _isSending = value;
+                RaisePropertyChanged();
+            }
+        }
 
-        public UpdateStatusWindowViewModel(Model model, Theme theme, CoreTweet.Configurations config)
-            : this(model, theme, config, Enumerable.Empty<string>())
+        public UpdateStatusWindowViewModel(Model model, Theme theme, CoreTweet.User user, CoreTweet.Configurations config)
+            : this(model, theme, user, config, Enumerable.Empty<string>())
         {
         }
 
-        public UpdateStatusWindowViewModel(Model model, Theme theme, CoreTweet.Configurations config, IEnumerable<string> paths)
+        public UpdateStatusWindowViewModel(Model model, Theme theme, CoreTweet.User user, CoreTweet.Configurations config, IEnumerable<string> paths)
         {
             this.model = model;
             this.Theme = theme;
+            this.AuthorizedUser = user;
             this.TwitterConfigrations = config;
             Text = string.Format(" {0}{1}", theme.HashTag.Substring(0, 1) == "#" ? "" : "#", theme.HashTag);
             Paths = new ObservableSynchronizedCollection<string>(paths);
@@ -121,13 +144,16 @@ namespace OnedrawHelper.ViewModels
 
         public void UpdateStatus()
         {
+            IsSending = true;
             Task.Run(async () =>
             {
                 bool succeed = await model.UpdateStatus(Text, Paths);
                 if (succeed)
-                    Messenger.Raise(new WindowActionMessage(WindowAction.Close));
+                    Messenger.Raise(new InteractionMessage("Close"));
                 else
                     Messenger.Raise(new InformationMessage("ツイートの送信に失敗しました。", "ツイート送信エラー", System.Windows.MessageBoxImage.Error, "InformationMessage"));
+
+                IsSending = false;
             });
 
         }

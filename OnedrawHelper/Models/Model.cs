@@ -32,10 +32,18 @@ namespace OnedrawHelper.Models
                 _token = value;
                 if (Token != null)
                     TwitterConfigrations = Token.Help.Configuration();
+
+                try
+                {
+                    AuthorizedUser = Token.Account.VerifyCredentials(include_entities => false, skip_status => true);
+                }
+                catch { AuthorizedUser = null; }
                 RaisePropertyChanged("IsAuthorized");
+                RaisePropertyChanged("AuthorizedUser");
             }
         }
         public bool IsAuthorized { get { return Token != null; } }
+        public CoreTweet.User AuthorizedUser { get; private set; }
         public ObservableSynchronizedCollection<ThemeModel> Themes { get; private set; }
         private DispatcherTimer UpdateTimer { get; set; }
 
