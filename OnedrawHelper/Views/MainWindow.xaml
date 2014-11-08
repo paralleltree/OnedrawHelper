@@ -161,6 +161,10 @@
             <l:TransitionInteractionMessageAction WindowType="{x:Type v:AuthorizeTwitterWindow}" Mode="Modal"/>
         </l:InteractionMessageTrigger>
 
+        <l:InteractionMessageTrigger MessageKey="UpdateStatus" Messenger="{Binding Messenger}">
+            <l:TransitionInteractionMessageAction WindowType="{x:Type v:UpdateStatusWindow}" Mode="Normal"/>
+        </l:InteractionMessageTrigger>
+
         <l:InteractionMessageTrigger MessageKey="FlashWindow" Messenger="{Binding Messenger}">
             <l:LivetCallMethodAction MethodName="Flash" MethodTarget="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=Window}}"/>
         </l:InteractionMessageTrigger>
