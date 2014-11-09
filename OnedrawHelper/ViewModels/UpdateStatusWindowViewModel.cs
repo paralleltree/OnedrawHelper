@@ -77,7 +77,10 @@ namespace OnedrawHelper.ViewModels
             }
         }
         public ObservableSynchronizedCollection<string> Paths { get; private set; }
-        public int RemainingLength { get { return 140 - Text.Length - TwitterConfigrations.CharactersReservedPerMedia; } }
+        public int RemainingLength
+        {
+            get { return 140 - Text.Length - (Paths.Count() > 0 ? TwitterConfigrations.CharactersReservedPerMedia : 0); }
+        }
         private CoreTweet.User _authorizedUser;
         public CoreTweet.User AuthorizedUser
         {
@@ -115,6 +118,13 @@ namespace OnedrawHelper.ViewModels
             this.TwitterConfigrations = config;
             Text = string.Format(" {0}{1}", theme.HashTag.Substring(0, 1) == "#" ? "" : "#", theme.HashTag);
             Paths = new ObservableSynchronizedCollection<string>(paths);
+
+            CompositeDisposable.Add(new CollectionChangedEventListener(Paths,
+                (sender, e) =>
+                {
+                    RaisePropertyChanged("RemainingLength");
+                    UpdateStatusCommand.RaiseCanExecuteChanged();
+                }));
         }
 
         public void Initialize()
@@ -139,7 +149,7 @@ namespace OnedrawHelper.ViewModels
 
         public bool CanUpdateStatus()
         {
-            return RemainingLength >= 0;
+            return RemainingLength < 140 && RemainingLength >= 0;
         }
 
         public void UpdateStatus()

@@ -148,12 +148,24 @@ namespace OnedrawHelper.Models
             if (Token == null) throw new InvalidOperationException("Twitterへの認証が行われていません。");
             var result = await Task.WhenAll(paths.Select(p => Token.Media.UploadAsync(media => new FileInfo(p))));
 
-            try
+            if (result.Count() > 0)
             {
-                var s = await Token.Statuses.UpdateWithMediaAsync(status => text, media => result.Select(p => p.MediaId));
+                try
+                {
+                    var s = await Token.Statuses.UpdateWithMediaAsync(status => text, media => result.Select(p => p.MediaId));
+                }
+                catch { return false; }
+                return true;
             }
-            catch { return false; }
-            return true;
+            else
+            {
+                try
+                {
+                    var s = await Token.Statuses.UpdateAsync(status => text);
+                }
+                catch { return false; }
+                return true;
+            }
         }
         #endregion
 
