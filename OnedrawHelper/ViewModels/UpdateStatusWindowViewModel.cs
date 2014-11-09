@@ -132,6 +132,33 @@ namespace OnedrawHelper.ViewModels
         }
 
 
+
+        #region RemovePathCommand
+        private ListenerCommand<string> _RemovePathCommand;
+
+        public ListenerCommand<string> RemovePathCommand
+        {
+            get
+            {
+                if (_RemovePathCommand == null)
+                {
+                    _RemovePathCommand = new ListenerCommand<string>(RemovePath, CanRemovePath);
+                }
+                return _RemovePathCommand;
+            }
+        }
+
+        public bool CanRemovePath()
+        {
+            return Paths.Count() > 0;
+        }
+
+        public void RemovePath(string parameter)
+        {
+            Paths.Remove(parameter);
+        }
+        #endregion
+
         #region UpdateStatusCommand
         private ViewModelCommand _UpdateStatusCommand;
 
