@@ -7,6 +7,7 @@
         xmlns:v="clr-namespace:OnedrawHelper.Views"
         xmlns:vm="clr-namespace:OnedrawHelper.ViewModels"
         xmlns:conv="clr-namespace:OnedrawHelper.Converters"
+        xmlns:b="clr-namespace:OnedrawHelper.Behaviors"
         Title="Twitter投稿" Height="225" Width="400"
         MinWidth="400" MinHeight="225">
 
@@ -61,7 +62,11 @@
 
             <StackPanel Orientation="Horizontal" ToolTip="このアカウントでツイートが送信されます。">
                 <Image Margin="2" Width="48" Height="48"
-                       RenderOptions.BitmapScalingMode="HighQuality"/>
+                       RenderOptions.BitmapScalingMode="HighQuality">
+                    <i:Interaction.Behaviors>
+                        <b:LazyImageBehavior LazySource="{Binding AuthorizedUser.ProfileImageUrl}"/>
+                    </i:Interaction.Behaviors>
+                </Image>
                 <StackPanel Margin="2" VerticalAlignment="Center">
                     <TextBlock Text="{Binding AuthorizedUser.ScreenName, StringFormat={}@{0}}"/>
                     <TextBlock Text="{Binding AuthorizedUser.Name}" FontSize="20"/>
@@ -82,7 +87,8 @@
         <TextBox Grid.Row="1" Margin="2,0,2,2" Text="{Binding Text, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" AcceptsReturn="True" TextWrapping="Wrap"/>
         <GridSplitter Grid.Row="2" Height="4" IsTabStop="False" Focusable="False" HorizontalAlignment="Stretch" VerticalContentAlignment="Center"/>
         <ScrollViewer Grid.Row="3" Margin="2" HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Hidden">
-            <StackPanel Orientation="Horizontal">
+            <StackPanel Orientation="Horizontal"
+                        Height="{Binding ViewportHeight, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=ScrollViewer}}">
                 <ItemsControl ItemsSource="{Binding Paths}">
                     <ItemsControl.ItemsPanel>
                         <ItemsPanelTemplate>
@@ -92,7 +98,11 @@
                     <ItemsControl.ItemTemplate>
                         <DataTemplate>
                             <Grid Margin="2">
-                                <Image/>
+                                <Image RenderOptions.BitmapScalingMode="HighQuality" Height="{Binding ActualHeight, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=Grid}}">
+                                    <i:Interaction.Behaviors>
+                                        <b:LazyImageBehavior LazySource="{Binding}"/>
+                                    </i:Interaction.Behaviors>
+                                </Image>
                                 <Button Content="r" FontFamily="Marlett" FontSize="14" Background="Black" Foreground="White"
                                     Command="{Binding DataContext.RemovePathCommand, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=Window}}"
                                     CommandParameter="{Binding}">
