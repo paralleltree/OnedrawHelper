@@ -152,7 +152,7 @@ namespace OnedrawHelper.Models
             {
                 try
                 {
-                    var s = await Token.Statuses.UpdateWithMediaAsync(status => text, media => result.Select(p => p.MediaId));
+                    var s = await Token.Statuses.UpdateAsync(status => text, media_ids => result.Select(p => p.MediaId));
                 }
                 catch { return false; }
                 return true;

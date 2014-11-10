@@ -12,6 +12,7 @@ using Livet.Messaging.IO;
 using Livet.EventListeners;
 using Livet.Messaging.Windows;
 
+using OnedrawHelper.Behaviors;
 using OnedrawHelper.Models;
 using OnedrawHelper.Data;
 using CoreTweet;
@@ -104,6 +105,7 @@ namespace OnedrawHelper.ViewModels
                 RaisePropertyChanged();
             }
         }
+        public AcceptDropDescription DropDescription { get; private set; }
 
         public UpdateStatusWindowViewModel(Model model, Theme theme, CoreTweet.User user, CoreTweet.Configurations config)
             : this(model, theme, user, config, Enumerable.Empty<string>())
@@ -125,12 +127,24 @@ namespace OnedrawHelper.ViewModels
                     RaisePropertyChanged("RemainingLength");
                     UpdateStatusCommand.RaiseCanExecuteChanged();
                 }));
+
+            DropDescription = AcceptDropDescription.FileDropDescription((e) =>
+            {
+                var data = e.Data.GetData(System.Windows.DataFormats.FileDrop) as IEnumerable<string>;
+                data = data.Where(p =>
+                    System.Text.RegularExpressions.Regex.IsMatch(p,
+                    @"\.(png|jpe?g|gif)\Z",
+                    System.Text.RegularExpressions.RegexOptions.IgnoreCase));
+
+                foreach (var item in data)
+                    Paths.Add(item);
+            });
+            RaisePropertyChanged("DropDescription");
         }
 
         public void Initialize()
         {
         }
-
 
 
         #region RemovePathCommand
@@ -181,6 +195,15 @@ namespace OnedrawHelper.ViewModels
 
         public void UpdateStatus()
         {
+            var deleted = Paths.Where(p => !System.IO.File.Exists(p));
+            if (deleted.Count() > 0)
+            {
+                Messenger.Raise(new InformationMessage("指定されたファイルの一部が見つかりませんでした。\n送信を中断します。", "ファイルが見つかりません", System.Windows.MessageBoxImage.Warning, "InformationMessage"));
+                foreach (var item in deleted)
+                    Paths.Remove(item);
+                return;
+            }
+
             IsSending = true;
             Task.Run(async () =>
             {

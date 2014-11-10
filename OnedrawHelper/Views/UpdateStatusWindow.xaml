@@ -9,6 +9,7 @@
         xmlns:conv="clr-namespace:OnedrawHelper.Converters"
         xmlns:b="clr-namespace:OnedrawHelper.Behaviors"
         Title="Twitter投稿" Height="225" Width="400"
+        Icon="../Resources/MainIcon.ico"
         MinWidth="400" MinHeight="225">
 
     <!--<Window.DataContext>
@@ -36,6 +37,10 @@
         </i:EventTrigger>
 
         <!--WindowのCloseキャンセル処理に対応する場合は、WindowCloseCancelBehaviorの使用を検討してください-->
+
+        <l:InteractionMessageTrigger MessageKey="InformationMessage" Messenger="{Binding Messenger}">
+            <l:InformationDialogInteractionMessageAction/>
+        </l:InteractionMessageTrigger>
 
         <l:InteractionMessageTrigger MessageKey="Close" Messenger="{Binding Messenger}">
             <l:WindowInteractionMessageAction>
@@ -86,7 +91,10 @@
         </Grid>
         <TextBox Grid.Row="1" Margin="2,0,2,2" Text="{Binding Text, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" AcceptsReturn="True" TextWrapping="Wrap"/>
         <GridSplitter Grid.Row="2" Height="4" IsTabStop="False" Focusable="False" HorizontalAlignment="Stretch" VerticalContentAlignment="Center"/>
-        <ScrollViewer Grid.Row="3" Margin="2" HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Hidden">
+        <ScrollViewer Grid.Row="3" Margin="2" HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Hidden" AllowDrop="True">
+            <i:Interaction.Behaviors>
+                <b:AcceptDropBehavior Description="{Binding DataContext.DropDescription, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=Window}}"/>
+            </i:Interaction.Behaviors>
             <StackPanel Orientation="Horizontal"
                         Height="{Binding ViewportHeight, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=ScrollViewer}}">
                 <ItemsControl ItemsSource="{Binding Paths}">

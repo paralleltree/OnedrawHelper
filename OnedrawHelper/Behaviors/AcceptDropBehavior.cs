@@ -64,7 +64,7 @@ namespace OnedrawHelper.Behaviors
         }
     }
 
-    public sealed class AcceptDropDescription
+    public class AcceptDropDescription
     {
         public event Action<DragEventArgs> DragOver;
 
@@ -81,6 +81,23 @@ namespace OnedrawHelper.Behaviors
         {
             var handler = DragDrop;
             if (handler != null) handler(e);
+        }
+
+        public static AcceptDropDescription FileDropDescription(Action<DragEventArgs> dropHandler)
+        {
+            var desc = new AcceptDropDescription();
+            desc.DragOver += (e) =>
+            {
+                if (!e.AllowedEffects.HasFlag(System.Windows.DragDropEffects.Copy)) return;
+                if (e.Data.GetDataPresent(System.Windows.DataFormats.FileDrop, true))
+                    e.Effects = System.Windows.DragDropEffects.Copy;
+                else
+                    e.Effects = System.Windows.DragDropEffects.None;
+
+                e.Handled = true;
+            };
+            desc.DragDrop += dropHandler;
+            return desc;
         }
     }
 }
