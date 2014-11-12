@@ -34,7 +34,7 @@
 
         <!--WindowのCloseキャンセル処理に対応する場合は、WindowCloseCancelBehaviorの使用を検討してください-->
 
-        <l:InteractionMessageTrigger MessageKey="AuthorizeError" Messenger="{Binding Messenger}">
+        <l:InteractionMessageTrigger MessageKey="InformationMessage" Messenger="{Binding Messenger}">
             <l:InformationDialogInteractionMessageAction/>
         </l:InteractionMessageTrigger>
 
