@@ -8,8 +8,9 @@
         xmlns:vm="clr-namespace:OnedrawHelper.ViewModels"
         xmlns:conv="clr-namespace:OnedrawHelper.Converters"
         xmlns:b="clr-namespace:OnedrawHelper.Behaviors"
-        Title="OnedrawHelper" WindowStyle="None" AllowsTransparency="True" SizeToContent="Height"
-        Icon="../Resources/MainIcon.ico"
+        Title="OnedrawHelper" Icon="../Resources/MainIcon.ico"
+        WindowStyle="None" SizeToContent="Height"
+        AllowsTransparency="True" AllowDrop="True"
         Width="200">
 
     <Window.DataContext>
@@ -136,6 +137,7 @@
 
     <i:Interaction.Behaviors>
         <b:SystemMenuBehavior CanMaximize="False"/>
+        <b:AcceptDropBehavior Description="{Binding DropDescription}"/>
     </i:Interaction.Behaviors>
 
     <i:Interaction.Triggers>
@@ -159,6 +161,10 @@
 
         <l:InteractionMessageTrigger MessageKey="AuthorizeTwitter" Messenger="{Binding Messenger}">
             <l:TransitionInteractionMessageAction WindowType="{x:Type v:AuthorizeTwitterWindow}" Mode="Modal"/>
+        </l:InteractionMessageTrigger>
+
+        <l:InteractionMessageTrigger MessageKey="UpdateStatus" Messenger="{Binding Messenger}">
+            <l:TransitionInteractionMessageAction WindowType="{x:Type v:UpdateStatusWindow}" Mode="Normal"/>
         </l:InteractionMessageTrigger>
 
         <l:InteractionMessageTrigger MessageKey="FlashWindow" Messenger="{Binding Messenger}">
