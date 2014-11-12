@@ -136,15 +136,13 @@ namespace OnedrawHelper.ViewModels
             }
         }
 
-        public void CreateSession()
+        public async void CreateSession()
         {
             this.IsSessionCreating = true;
-            Task.Run(async () =>
-            {
-                this.Session = await model.CreateAuthorizeSession();
-                System.Diagnostics.Process.Start(Session.AuthorizeUri.AbsoluteUri);
-                this.IsSessionCreated = true;
-            });
+
+            this.Session = await model.CreateAuthorizeSession();
+            System.Diagnostics.Process.Start(Session.AuthorizeUri.AbsoluteUri);
+            this.IsSessionCreated = true;
         }
         #endregion
 
@@ -168,18 +166,16 @@ namespace OnedrawHelper.ViewModels
             return this.IsSessionCreated && this.PinCode.Length == 7;
         }
 
-        public void Authorize()
+        public async void Authorize()
         {
             this.IsAuthorizing = true;
-            Task.Run(async () =>
-            {
-                bool result = await model.Authorize(this.Session, this.PinCode);
-                this.IsAuthorizing = false;
-                if (result)
-                    this.Messenger.Raise(new InteractionMessage("Close"));
-                else
-                    this.Messenger.Raise(new InformationMessage("認証に失敗しました。\nPINコードを再度確認してください。", "認証エラー", System.Windows.MessageBoxImage.Error, "AuthorizeError"));
-            });
+
+            bool result = await model.Authorize(this.Session, this.PinCode);
+            this.IsAuthorizing = false;
+            if (result)
+                this.Messenger.Raise(new InteractionMessage("Close"));
+            else
+                this.Messenger.Raise(new InformationMessage("認証に失敗しました。\nPINコードを再度確認してください。", "認証エラー", System.Windows.MessageBoxImage.Error, "InformationMessage"));
         }
         #endregion
 

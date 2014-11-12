@@ -25,6 +25,7 @@
     <DefineConstants>DEBUG;TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
+    <UseVSHostingProcess>true</UseVSHostingProcess>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|x86' ">
     <DebugType>pdbonly</DebugType>
@@ -76,6 +77,11 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="Behaviors\BeginDragBehavior.cs" />
+    <Compile Include="Behaviors\LazyImageBehavior.cs" />
+    <Compile Include="Views\UpdateStatusWindow.xaml.cs">
+      <DependentUpon>UpdateStatusWindow.xaml</DependentUpon>
+    </Compile>
     <Page Include="Views\AuthorizeTwitterWindow.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
@@ -88,6 +94,7 @@
       <DependentUpon>App.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="Behaviors\AcceptDropBehavior.cs" />
     <Compile Include="Behaviors\SystemMenuBehavior.cs" />
     <Compile Include="Converters\InverseBooleanConverter.cs" />
     <Compile Include="Converters\StringCollectionAsFlatConverter.cs" />
@@ -98,6 +105,7 @@
     <Compile Include="ViewModels\ChallengeViewModel.cs" />
     <Compile Include="ViewModels\MainWindowViewModel.cs" />
     <Compile Include="ViewModels\ThemeViewModel.cs" />
+    <Compile Include="ViewModels\UpdateStatusWindowViewModel.cs" />
     <Compile Include="Views\AuthorizeTwitterWindow.xaml.cs">
       <DependentUpon>AuthorizeTwitterWindow.xaml</DependentUpon>
     </Compile>
@@ -106,6 +114,10 @@
       <DependentUpon>MainWindow.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
+    <Page Include="Views\UpdateStatusWindow.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Properties\AssemblyInfo.cs">

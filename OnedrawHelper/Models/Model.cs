@@ -20,6 +20,7 @@ namespace OnedrawHelper.Models
          */
         private readonly string ThemesPath = "themes.json";
         private readonly string SettingPath = "settings.json";
+        public CoreTweet.Configurations TwitterConfigrations { get; private set; }
 
         private Tokens _token;
         private Tokens Token
@@ -29,10 +30,24 @@ namespace OnedrawHelper.Models
             {
                 if (_token == value) return;
                 _token = value;
-                RaisePropertyChanged("IsAuthorized");
+
+                Task.Run(() =>
+                {
+                    if (Token != null)
+                        TwitterConfigrations = Token.Help.Configuration();
+
+                    try
+                    {
+                        AuthorizedUser = Token.Account.VerifyCredentials(include_entities => false, skip_status => true);
+                    }
+                    catch { AuthorizedUser = null; }
+                    RaisePropertyChanged("IsAuthorized");
+                    RaisePropertyChanged("AuthorizedUser");
+                });
             }
         }
         public bool IsAuthorized { get { return Token != null; } }
+        public CoreTweet.User AuthorizedUser { get; private set; }
         public ObservableSynchronizedCollection<ThemeModel> Themes { get; private set; }
         private DispatcherTimer UpdateTimer { get; set; }
 
@@ -64,19 +79,25 @@ namespace OnedrawHelper.Models
                     Themes.Add(item);
             }
 
-            if (File.Exists(SettingPath))
-            {
-                var settings = JsonConvert.DeserializeObject<Dictionary<string, string>>(File.ReadAllText(SettingPath));
-                try
-                {
-                    Token = Tokens.Create(Properties.Resources.ConsumerKey, Properties.Resources.ConsumerSecret, settings["AccessToken"], settings["AccessTokenSecret"]);
-                }
-                catch { }
-            }
+            UpdateTimer.Tick += async (sender, e) => await UpdateThemes();
 
-            UpdateThemes();
-            UpdateTimer.Tick += (sender, e) => UpdateThemes();
-            UpdateTimer.Start();
+            Task.Run(() =>
+            {
+                if (File.Exists(SettingPath))
+                {
+                    var settings = JsonConvert.DeserializeObject<Dictionary<string, string>>(File.ReadAllText(SettingPath));
+                    try
+                    {
+                        Token = Tokens.Create(Properties.Resources.ConsumerKey, Properties.Resources.ConsumerSecret, settings["AccessToken"], settings["AccessTokenSecret"]);
+                    }
+                    catch { }
+                }
+            })
+            .ContinueWith(async t =>
+            {
+                await UpdateThemes();
+                UpdateTimer.Start();
+            });
         }
 
         #region Singleton
@@ -92,14 +113,17 @@ namespace OnedrawHelper.Models
         #endregion
 
 
-        private void UpdateThemes()
+        private async Task UpdateThemes()
         {
-            if (Token == null) return;
-            Task.Run(async () =>
+            try
             {
-                foreach (var t in Themes)
-                    await t.UpdateNextChallengeAsync(Token);
-            });
+                await Token.Account.VerifyCredentialsAsync();
+            }
+            catch { Token = null; }
+            if (Token == null) return;
+
+            foreach (var t in Themes)
+                await t.UpdateNextChallengeAsync(Token);
         }
 
         #region Twitter
@@ -124,6 +148,31 @@ namespace OnedrawHelper.Models
                     return false;
                 }
             });
+        }
+
+        public async Task<bool> UpdateStatus(string text, IEnumerable<string> paths)
+        {
+            if (Token == null) throw new InvalidOperationException("Twitterへの認証が行われていません。");
+            var result = await Task.WhenAll(paths.Select(p => Token.Media.UploadAsync(media => new FileInfo(p))));
+
+            if (result.Count() > 0)
+            {
+                try
+                {
+                    var s = await Token.Statuses.UpdateAsync(status => text, media_ids => result.Select(p => p.MediaId));
+                }
+                catch { return false; }
+                return true;
+            }
+            else
+            {
+                try
+                {
+                    var s = await Token.Statuses.UpdateAsync(status => text);
+                }
+                catch { return false; }
+                return true;
+            }
         }
         #endregion
 

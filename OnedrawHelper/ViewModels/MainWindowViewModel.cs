@@ -12,6 +12,7 @@ using Livet.Messaging.IO;
 using Livet.EventListeners;
 using Livet.Messaging.Windows;
 
+using OnedrawHelper.Behaviors;
 using OnedrawHelper.Models;
 using OnedrawHelper.Data;
 
@@ -77,6 +78,7 @@ namespace OnedrawHelper.ViewModels
             get
             {
                 if (Themes == null) return null;
+                if (ThemesEnumerator == null) return null;
                 try
                 {
                     return ThemesEnumerator.Current;
@@ -89,6 +91,7 @@ namespace OnedrawHelper.ViewModels
         }
         public bool IsUpdatedAny { get { return CanMoveNextTheme() && Themes.Any(p => p.IsUpdated); } }
         private DispatcherTimer RefreshTimer { get; set; }
+        public AcceptDropDescription DropDescription { get; private set; }
 
         public void Initialize()
         {
@@ -132,10 +135,24 @@ namespace OnedrawHelper.ViewModels
                 {
                     case "IsAuthorized":
                         RaisePropertyChanged("IsAuthorized");
+                        UpdateStatusCommand.RaiseCanExecuteChanged();
                         break;
                 }
             });
             CompositeDisposable.Add(listener);
+
+            DropDescription = AcceptDropDescription.FileDropDescription((e) =>
+            {
+                var data = e.Data.GetData(System.Windows.DataFormats.FileDrop) as IEnumerable<string>;
+                data = data.Where(p =>
+                    System.Text.RegularExpressions.Regex.IsMatch(p,
+                    @"\.(png|jpe?g|gif)\Z",
+                    System.Text.RegularExpressions.RegexOptions.IgnoreCase));
+
+                if (UpdateStatusCommand.CanExecute)
+                    Messenger.Raise(new TransitionMessage(new UpdateStatusWindowViewModel(this.model, CurrentTheme.Theme, model.AuthorizedUser, model.TwitterConfigrations, data), "UpdateStatus"));
+            });
+            RaisePropertyChanged("DropDescription");
 
             model.Initialize();
 
@@ -201,6 +218,32 @@ namespace OnedrawHelper.ViewModels
         public void AuthorizeTwitter()
         {
             Messenger.Raise(new TransitionMessage(new AuthorizeTwitterWindowViewModel(this.model), "AuthorizeTwitter"));
+        }
+        #endregion
+
+        #region UpdateStatusCommand
+        private ViewModelCommand _UpdateStatusCommand;
+
+        public ViewModelCommand UpdateStatusCommand
+        {
+            get
+            {
+                if (_UpdateStatusCommand == null)
+                {
+                    _UpdateStatusCommand = new ViewModelCommand(UpdateStatus, CanUpdateStatus);
+                }
+                return _UpdateStatusCommand;
+            }
+        }
+
+        public bool CanUpdateStatus()
+        {
+            return CurrentTheme != null && IsAuthorized;
+        }
+
+        public void UpdateStatus()
+        {
+            Messenger.Raise(new TransitionMessage(new UpdateStatusWindowViewModel(this.model, CurrentTheme.Theme, model.AuthorizedUser, model.TwitterConfigrations), "UpdateStatus"));
         }
         #endregion
 
