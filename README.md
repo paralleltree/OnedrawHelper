@@ -5,7 +5,8 @@ OnedrawHelperは、Twitter上で開催されるワンドロの補助を目的と
 
 ## 機能
  * 次回のワンドロのお題取得
- * 経過時間, 残り時間の表示, 切り替え
+ * 開始時刻, 経過時間, 残り時間の表示, 切り替え
+ * Twitterへの画像投稿
 
 ## 導入/使い方
  * ダウンロードは[こちら](https://github.com/paralleltree/OnedrawHelper/releases)、下部の緑色のボタンから行えます。
